@@ -169,6 +169,7 @@ class test_dimshuffle_lift(unittest.TestCase):
         # Check stacktrace was copied over correctly after opt was applied
         self.assertTrue(check_stack_trace(g, ops_to_check='all'))
 
+
     def test_recursive_lift(self):
         v = T.vector(dtype="float64")
         m = T.matrix(dtype="float64")
@@ -217,6 +218,16 @@ class test_dimshuffle_lift(unittest.TestCase):
         self.assertTrue(str(g) == "[DimShuffle{0,x}(x), DimShuffle{2,1,0}(y), DimShuffle{2,1,0}(z), DimShuffle{x}(TensorConstant{1})]")
         dimshuffle_lift.optimize(g)
         self.assertTrue(str(g) == "[x, y, DimShuffle{2,1,0}(z), DimShuffle{x}(TensorConstant{1})]")
+        # Check stacktrace was copied over correctly after opt was applied
+        self.assertTrue(hasattr(g.outputs[0].tag, 'trace'))
+
+    def test_useless_dimshuffle(self):
+        x, _, _ = inputs()
+        e = ds(x, (0, 1))
+        g = FunctionGraph([x], [e])
+        self.assertTrue(str(g) == "[DimShuffle{0,1}(x)]")
+        dimshuffle_lift.optimize(g)
+        self.assertTrue(str(g) == "[x]")
         # Check stacktrace was copied over correctly after opt was applied
         self.assertTrue(hasattr(g.outputs[0].tag, 'trace'))
 

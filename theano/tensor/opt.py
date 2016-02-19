@@ -602,6 +602,11 @@ def local_dimshuffle_lift(node):
         copy_stack_trace(node.outputs[0], ret)
         return [ret]
 
+    # remove useless dimshuffle in general
+    if (list(op.new_order) == list(range(len(op.new_order))) and
+            len(op.new_order) == input.type.ndim):
+        return [input]
+
 
 @register_canonicalize
 @gof.local_optimizer([DimShuffle])
