@@ -731,6 +731,29 @@ def norm(x, ord):
 
 class TensorInv(Op):
 
+    """
+    Compute the 'inverse' of an N-dimensional array.
+
+    The result is an inverse for `a` relative to the tensordot operation
+    ``tensordot(a, b, ind)``, i. e., up to floating-point accuracy,
+    ``tensordot(tensorinv(a), a, ind)`` is the "identity" tensor for the
+    tensordot operation.
+
+    Parameters
+    ----------
+    a : array_like
+        Tensor to 'invert'. Its shape must be 'square', i. e.,
+        ``prod(a.shape[:ind]) == prod(a.shape[ind:])``.
+    ind : int, optional
+        Number of first indices that are involved in the inverse sum.
+        Must be a positive integer, default is 2.
+
+    Returns
+    -------
+    b : ndarray
+        `a`'s tensordot inverse, shape ``a.shape[:ind] + a.shape[ind:]``.
+    """
+
     def __eq__(self, other):
         return type(self) == type(other)
 
@@ -744,7 +767,7 @@ class TensorInv(Op):
         except NotScalarConstantError:
            ind = node.inputs[1]
            sym_shapes = as_tensor_variable(shapes[0])
-           return sym_shapes[ind:] + sym_shapes[:ind]
+           return [sym_shapes[ind:] + sym_shapes[:ind]]
 
     def make_node(self, x, ind=2):
         x = as_tensor_variable(x)
@@ -772,25 +795,4 @@ class TensorInv(Op):
 
 tensorinv = TensorInv()
 
-"""
-    Compute the 'inverse' of an N-dimensional array.
 
-    The result is an inverse for `a` relative to the tensordot operation
-    ``tensordot(a, b, ind)``, i. e., up to floating-point accuracy,
-    ``tensordot(tensorinv(a), a, ind)`` is the "identity" tensor for the
-    tensordot operation.
-
-    Parameters
-    ----------
-    a : array_like
-        Tensor to 'invert'. Its shape must be 'square', i. e.,
-        ``prod(a.shape[:ind]) == prod(a.shape[ind:])``.
-    ind : int, optional
-        Number of first indices that are involved in the inverse sum.
-        Must be a positive integer, default is 2.
-
-    Returns
-    -------
-    b : ndarray
-        `a`'s tensordot inverse, shape ``a.shape[:ind] + a.shape[ind:]``.
-"""
