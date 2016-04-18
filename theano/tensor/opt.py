@@ -607,7 +607,6 @@ def local_dimshuffle_lift(node):
             len(op.new_order) == input.type.ndim):
         return [input]
 
-
 @register_canonicalize
 @gof.local_optimizer([DimShuffle])
 def local_lift_transpose_through_dot(node):
