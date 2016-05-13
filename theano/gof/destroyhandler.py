@@ -17,7 +17,7 @@ from theano.misc.ordered_set import OrderedSet
 
 from .fg import InconsistencyError
 from six.moves.queue import Queue
-import logging
+from theano import config
 
 
 class ProtocolError(Exception):
@@ -693,6 +693,7 @@ class DestroyHandler(toolbox.Bookkeeper):  # noqa
 
         """
         self.root_destroyer = OrderedDict()
+        self.fail_validate = False
 
     def on_attach(self, fgraph):
         """
@@ -791,12 +792,13 @@ class DestroyHandler(toolbox.Bookkeeper):  # noqa
         - But destroyed inputs should have only 1 clients
         """
 
+        if not config.faster_cycle:
+            return True
+
         dm = getattr(app.op, 'destroy_map', None)
         if not dm:
             return
 
-        logging.basicConfig()
-        log = logging.getLogger("LOG")
         destroyed_inputs_idx = []  # list of app's destroyed inputs
         for i in dm.values():
             destroyed_inputs_idx += i
@@ -807,12 +809,12 @@ class DestroyHandler(toolbox.Bookkeeper):  # noqa
                 continue
             # Current simplest version don't allow destroyed inputs to
             # have more then 1 client.
-            raise InconsistencyError()
+                self.fail_validate = True
+
             # Temp code to try to allow inplace on inputs with more
             # then 1 clients, but not on view. To explore only after
             # the first version completly work and is merged and there
             # is time.
-
             # if d_inp.owner:
             #     d_inp_apply = d_inp.owner
 
@@ -846,7 +848,6 @@ class DestroyHandler(toolbox.Bookkeeper):  # noqa
 
         # If it's a destructive op, add it to our watch list
         if getattr(app.op, 'destroy_map', {}):
-            # TODO: check here only one level of fast destroy_map.
             self.destroyers.add(app)
             self.fast_destroy(app)
 
@@ -962,6 +963,10 @@ class DestroyHandler(toolbox.Bookkeeper):  # noqa
         b) orderings cannot be topologically sorted.
 
         """
+        if config.faster_cycle and self.fail_validate:
+            self.fail_validate = False
+            raise InconsistencyError("fast_cycle doesn't accept this graph.")
+
         if self.destroyers:
             ords = self.orderings(fgraph)
 

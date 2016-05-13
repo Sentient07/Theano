@@ -1122,6 +1122,10 @@ AddConfigVar('cmodule.preload_cache',
              BoolParam(False, allow_override=False),
              in_c_key=False)
 
+AddConfigVar('faster_cycle',
+             "If set to true, this will enable the fast_destroy.",
+             BoolParam(False, allow_override=True))
+
 
 def default_blas_ldflags():
     global numpy
