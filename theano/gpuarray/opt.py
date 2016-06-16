@@ -333,10 +333,14 @@ class GraphToGPU(NavigatorOptimizer):
                 # optimization for one of the clients op, then we will
                 # move the client to the GPU.
                 for c, _ in node.outputs[0].clients:
-                    if (c != 'output' and
-                        (self.local_optimizers_map.get(c.op, []) +
-                         self.local_optimizers_map.get(type(c.op)))):
-                        move_to_GPU = True
+                    try:
+                        if (c != 'output' and
+                            (self.local_optimizers_map.get(c.op, []) +
+                             self.local_optimizers_map.get(type(c.op)))):
+                            move_to_GPU = True
+                    except TypeError:
+                        assert self.local_optimizers_map.get(c.op, []) is None or \
+                                self.local_optimizers_map.get(type(c.op)) is None
             new_ops = None
             outputs = []
             # Apply the lifter
