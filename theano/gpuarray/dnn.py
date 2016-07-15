@@ -1449,6 +1449,8 @@ def local_abstractconv_cudnn_graph(op, context_name, inputs, outputs):
     else:
         conv_mode = 'cross'
 
+    import pdb
+    pdb.set_trace()
     if isinstance(op, AbstractConv2d):
         rval = dnn_conv(inp1, inp2,
                         border_mode=op.border_mode,
