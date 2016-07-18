@@ -1440,6 +1440,22 @@ def local_abstractconv_cudnn_graph(op, context_name, inputs, outputs):
 
     inp1 = inputs[0]
     inp2 = inputs[1]
+    
+    import pdb
+    from .basic_ops import GpuFromHost, HostFromGpu
+    for i in [inp1, inp2]:
+        if (isinstance(op, GpuFromHost) and
+            i.owner and
+            isinstance(i.owner.op, HostFromGpu) and
+            i.owner.inputs[0].owner and
+            isinstance(i.owner.inputs[0].owner.op, GpuFromHost)):
+            pdb.set_trace()
+        if (isinstance(op, HostFromGpu) and
+            i.owner and
+            isinstance(i.owner.op, GpuFromHost) and
+            i.owner.inputs[0].owner and
+            isinstance(i.owner.inputs[0].owner.op, HostFromGpu)):
+            pdb.set_trace()
 
     if not dnn_available(inp1.type.context_name):
         raise_no_cudnn()
@@ -1449,8 +1465,6 @@ def local_abstractconv_cudnn_graph(op, context_name, inputs, outputs):
     else:
         conv_mode = 'cross'
 
-    import pdb
-    pdb.set_trace()
     if isinstance(op, AbstractConv2d):
         rval = dnn_conv(inp1, inp2,
                         border_mode=op.border_mode,

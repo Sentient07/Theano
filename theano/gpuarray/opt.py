@@ -1275,6 +1275,21 @@ def local_inplace_sparseblockouter(node):
             AbstractConv2d_gradWeights,
             AbstractConv2d_gradInputs])
 def local_gpua_abstractconv2d(op, context_name, inputs, outputs):
+    import pdb
+    from .basic_ops import GpuFromHost, HostFromGpu
+    for i in [inp1, inp2]:
+        if (isinstance(op, GpuFromHost) and
+            i.owner and
+            isinstance(i.owner.op, HostFromGpu) and
+            i.owner.inputs[0].owner and
+            isinstance(i.owner.inputs[0].owner.op, GpuFromHost)):
+            pdb.set_trace()
+        if (isinstance(op, HostFromGpu) and
+            i.owner and
+            isinstance(i.owner.op, GpuFromHost) and
+            i.owner.inputs[0].owner and
+            isinstance(i.owner.inputs[0].owner.op, HostFromGpu)):
+            pdb.set_trace()
     if isinstance(outputs[0].type, GpuArrayType):
         # Don't handle this node here, it's already on the GPU.
         return
