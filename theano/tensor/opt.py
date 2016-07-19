@@ -368,7 +368,7 @@ compile.optdb.register('inplace_elemwise_opt', inplace_elemwise_optimizer, 75,
                        'inplace_elemwise_optimizer',
                        'fast_run', 'inplace')
 
-
+position = 0
 def register_useless(lopt, *tags, **kwargs):
     if type(lopt) == str:
         def register(inner_lopt):
@@ -379,6 +379,7 @@ def register_useless(lopt, *tags, **kwargs):
         compile.mode.local_useless.register(name, lopt, 'last', 'fast_run',
                                             *tags, **kwargs)
         return lopt
+
 
 
 def register_canonicalize(lopt, *tags, **kwargs):
