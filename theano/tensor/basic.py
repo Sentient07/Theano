@@ -2284,8 +2284,6 @@ def ones_like(model, dtype=None):
     """
     if dtype is None:
         dtype = model.type.dtype
-    if model.ndim == 0:
-        return constant(1.0, dtype=dtype)
     ret = fill(model, constant(1.0, dtype=dtype))
     return ret
 
@@ -2306,8 +2304,6 @@ def zeros_like(model, dtype=None):
 
     if dtype is None:
         dtype = model.type.dtype
-    if model.ndim == 0:
-        return constant(0.0, dtype=dtype)
     return fill(model, constant(0.0, dtype=dtype))
 
 
@@ -2319,8 +2315,6 @@ def zeros(shape, dtype=None):
         shape = [shape]
     if dtype is None:
         dtype = config.floatX
-    if isinstance(shape, (list, tuple)) and len(shape) == 0:
-        return constant(0.0, dtype=dtype)
     return alloc(numpy.array(0, dtype=dtype), *shape)
 
 
@@ -2332,8 +2326,6 @@ def ones(shape, dtype=None):
         shape = [shape]
     if dtype is None:
         dtype = config.floatX
-    if isinstance(shape, (list, tuple)) and len(shape) == 0:
-        return constant(1.0, dtype=dtype)
     return alloc(numpy.array(1, dtype=dtype), *shape)
 
 
