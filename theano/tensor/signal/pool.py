@@ -239,7 +239,7 @@ class Pool(OpenMPOp):
                  mode='max', openmp=None):
         super(Pool, self).__init__(openmp=openmp)
         self.ds = tuple(ds)
-        if not all([isinstance(d, integer_types) for d in ds]):
+        if not all( isinstance(d, integer_types) for d in ds):
             raise ValueError(
                 "Pool downsample parameters must be ints."
                 " Got %s" % str(ds))
@@ -914,7 +914,7 @@ class DownsampleFactorMaxGradGrad(OpenMPOp):
 
     def __init__(self, ds, ignore_border, st=None, padding=(0, 0), mode='max', openmp=None):
         self.ds = tuple(ds)
-        if not all([isinstance(d, integer_types) for d in ds]):
+        if not all( isinstance(d, integer_types) for d in ds):
             raise ValueError(
                 "Pool downsample parameters must be ints."
                 " Got %s" % str(ds))

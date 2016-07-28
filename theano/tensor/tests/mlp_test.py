@@ -297,7 +297,7 @@ def test_mlp():
             mode=mode)
     # print 'MODEL 1'
     #theano.printing.debugprint(train_model, print_type=True)
-    assert any([isinstance(i.op, T.nnet.CrossentropySoftmax1HotWithBiasDx) for i in train_model.maker.fgraph.toposort()])
+    assert any( isinstance(i.op, T.nnet.CrossentropySoftmax1HotWithBiasDx) for i in train_model.maker.fgraph.toposort())
 
     # Even without FeatureShape
     train_model = theano.function( inputs=[index],
@@ -309,7 +309,7 @@ def test_mlp():
     # print
     # print 'MODEL 2'
     #theano.printing.debugprint(train_model, print_type=True)
-    assert any([isinstance(i.op, T.nnet.CrossentropySoftmax1HotWithBiasDx) for i in train_model.maker.fgraph.toposort()])
+    assert any( isinstance(i.op, T.nnet.CrossentropySoftmax1HotWithBiasDx) for i in train_model.maker.fgraph.toposort())
 
 if __name__ == '__main__':
     test_mlp()

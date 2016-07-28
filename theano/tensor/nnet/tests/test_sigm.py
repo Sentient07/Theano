@@ -349,7 +349,7 @@ class T_sigmoid_opts(unittest.TestCase):
         mode = self.get_mode().including('local_hard_sigmoid')
         f = theano.function([x], s, mode=mode)
         topo = f.maker.fgraph.toposort()
-        assert not any([n.op == sigmoid for n in topo])
+        assert not any( n.op == sigmoid for n in topo)
         ux_v = f([[-50, -10, -4, -1, 0, 1, 4, 10, 50]])
 
         mode2 = mode.excluding('fusion').excluding('inplace')

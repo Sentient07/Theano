@@ -194,8 +194,8 @@ def _params_allgood(ishape, kshape, mode, subsample=(1, 1), img_stride=(1, 1),
                                           kshp=compile_kshp)(i, k)
     f = theano.function([i, k], op, mode=theano_mode)
     if cls is not None:
-        assert any([isinstance(node.op, cls)
-                    for node in f.maker.fgraph.toposort()]), "Cannot find class %r in %r" % (cls, f.maker.fgraph.toposort())
+        assert any( isinstance(node.op, cls)
+                    for node in f.maker.fgraph.toposort()), "Cannot find class %r in %r" % (cls, f.maker.fgraph.toposort())
     t2 = time.time()
     gpuval = f(img, kern)
     t3 = time.time()
@@ -441,11 +441,11 @@ def test_default_conv():
     f = theano.function([img, fil], c, mode=theano_mode)
 
     if cuda.dnn.dnn_available():
-        assert any([isinstance(a.op, GpuDnnConv)
-                    for a in f.maker.fgraph.apply_nodes])
+        assert any( isinstance(a.op, GpuDnnConv)
+                    for a in f.maker.fgraph.apply_nodes)
     else:
-        assert any([isinstance(a.op, cuda.blas.GpuCorrMM)
-                    for a in f.maker.fgraph.apply_nodes])
+        assert any( isinstance(a.op, cuda.blas.GpuCorrMM)
+                    for a in f.maker.fgraph.apply_nodes)
 
 
 def _test_full(cls, mode=None, version=[-1], extra_shapes=[],

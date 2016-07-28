@@ -596,9 +596,10 @@ def local_gpu_multinomial(node):
             return None
         m, = node.outputs
         if (p.dtype == u.dtype == m.dtype == 'float32' and
-            any([i.owner and isinstance(i.owner.op,
+            any(
+            i.owner and isinstance(i.owner.op,
                                         theano.sandbox.cuda.HostFromGpu)
-                 for i in node.inputs])):
+                 for i in node.inputs)):
             gpu_op = GpuMultinomialFromUniform(node.op.odtype)
             return [host_from_gpu(gpu_op(*[gpu_from_host(i)
                                            for i in [p, u]])).T]

@@ -185,7 +185,7 @@ def test_dot22scalar():
             [a, b],
             tensor.dot(a, b) * numpy.asarray(4, 'float32'))
         t = f.maker.fgraph.toposort()
-        assert any([isinstance(n.op, tcn.blas.GpuDot22Scalar) for n in t])
+        assert any( isinstance(n.op, tcn.blas.GpuDot22Scalar) for n in t)
 #        assert any([isinstance(n.op, tcn.basic_ops.GpuAllocEmpty)
 #                    for n in t])
         assert numpy.allclose(f(av, bv), f2(av, bv))
@@ -194,7 +194,7 @@ def test_dot22scalar():
                             mode=mode_with_gpu)
         f2 = theano.function([a, b, scalar], tensor.dot(a, b) * scalar)
         t = f.maker.fgraph.toposort()
-        assert any([isinstance(n.op, tcn.blas.GpuDot22Scalar) for n in t])
+        assert any( isinstance(n.op, tcn.blas.GpuDot22Scalar) for n in t)
 #        assert any([isinstance(n.op, tcn.basic_ops.GpuAllocEmpty)
 #                    for n in t])
         assert numpy.allclose(f(av, bv, 0.5), f2(av, bv, 0.5))
@@ -228,8 +228,8 @@ def test_gemm():
 
         f = pfunc([b, c], [], updates=[(a, tensor.dot(a, b) + tensor.exp(c))],
                   mode=mode_with_gpu)
-        assert any([node.op == tcn.blas.gpu_gemm_inplace
-                    for node in f.maker.fgraph.toposort()])
+        assert any( node.op == tcn.blas.gpu_gemm_inplace
+                    for node in f.maker.fgraph.toposort())
 
         bval = my_rand(* b_shp)
         cval = my_rand(a_shp[0], b_shp[1])
@@ -269,8 +269,8 @@ def test_gemm_no_inplace():
                   updates=[(a, tensor.dot(a, b) + c)],
                   mode=mode_with_gpu)
 
-        assert any([node.op == tcn.blas.gpu_gemm_no_inplace
-                    for node in f.maker.fgraph.toposort()])
+        assert any( node.op == tcn.blas.gpu_gemm_no_inplace
+                    for node in f.maker.fgraph.toposort())
         bval = my_rand(*b_shp)
         bval2 = my_rand(*b_shp)
         rval = f(bval, bval2)
@@ -376,11 +376,11 @@ def test_downsample():
                           mode=mode_with_gpu.excluding('cudnn'))
                 f2 = pfunc([], ds_op(tensor.as_tensor_variable(a)),
                            mode=mode_without_gpu)
-                assert any([isinstance(node.op,
+                assert any( isinstance(node.op,
                                        tcn.blas.GpuDownsampleFactorMax)
-                            for node in f.maker.fgraph.toposort()])
-                assert any([isinstance(node.op, Pool)
-                            for node in f2.maker.fgraph.toposort()])
+                            for node in f.maker.fgraph.toposort())
+                assert any( isinstance(node.op, Pool)
+                            for node in f2.maker.fgraph.toposort())
                 assert numpy.allclose(f(), f2())
 
                 # The grad is too slow on GT220 GPU
@@ -401,11 +401,11 @@ def test_downsample():
                     tensor.grad(ds_op(tensor.as_tensor_variable(a)).sum(),
                                 a),
                     mode=mode_without_gpu)
-                assert any([isinstance(node.op,
+                assert any( isinstance(node.op,
                                        tcn.blas.GpuDownsampleFactorMaxGrad)
-                            for node in g.maker.fgraph.toposort()])
-                assert any([isinstance(node.op, PoolGrad)
-                            for node in g2.maker.fgraph.toposort()])
+                            for node in g.maker.fgraph.toposort())
+                assert any( isinstance(node.op, PoolGrad)
+                            for node in g2.maker.fgraph.toposort())
                 assert numpy.allclose(g(), g2()), shp
 
                 ggf = gradient.Lop(tensor.grad((ds_op(
@@ -418,12 +418,12 @@ def test_downsample():
                 gg = pfunc([], ggf, mode=gpu_mode)
                 gg2 = pfunc([], ggf, mode=ref_mode)
 
-                assert any([isinstance(
+                assert any( isinstance(
                     node.op, tcn.blas.GpuDownsampleFactorMaxGradGrad)
-                    for node in gg.maker.fgraph.toposort()])
-                assert any([isinstance(
+                    for node in gg.maker.fgraph.toposort())
+                assert any( isinstance(
                     node.op, DownsampleFactorMaxGradGrad)
-                    for node in gg2.maker.fgraph.toposort()])
+                    for node in gg2.maker.fgraph.toposort())
                 assert numpy.allclose(gg(), gg2()), shp
 
                 # We already check that the gpu version return

@@ -413,40 +413,40 @@ def test_local_gpu_subtensor():
     t = tensor._shared(numpy.zeros(20, "float32"))
     f = theano.function([], t[3:4], mode=mode_with_gpu)
     topo = f.maker.fgraph.toposort()
-    assert any([type(node.op) is tensor.Subtensor for node in topo])
-    assert not any([isinstance(node.op, cuda.GpuSubtensor) for node in topo])
+    assert any( type(node.op) is tensor.Subtensor for node in topo)
+    assert not any( isinstance(node.op, cuda.GpuSubtensor) for node in topo)
 
     # Test graph input.
     t = tensor.fmatrix()
     f = theano.function([t], t[3:4], mode=mode_with_gpu)
     topo = f.maker.fgraph.toposort()
-    assert any([type(node.op) is tensor.Subtensor for node in topo])
-    assert not any([isinstance(node.op, cuda.GpuSubtensor) for node in topo])
+    assert any( type(node.op) is tensor.Subtensor for node in topo)
+    assert not any( isinstance(node.op, cuda.GpuSubtensor) for node in topo)
 
     # Test multiple use of the input
     # We want the subtensor to be on the GPU to prevent multiple transfer.
     t = tensor.fmatrix()
     f = theano.function([t], [t[3:4], t + 1], mode=mode_with_gpu)
     topo = f.maker.fgraph.toposort()
-    assert not any([type(node.op) is tensor.Subtensor for node in topo])
-    assert any([isinstance(node.op, cuda.GpuSubtensor) for node in topo])
+    assert not any( type(node.op) is tensor.Subtensor for node in topo)
+    assert any( isinstance(node.op, cuda.GpuSubtensor) for node in topo)
 
     # Test multiple use of the input + input as output
     # We want the subtensor to be on the GPU to prevent multiple transfer.
     t = tensor.fmatrix()
     f = theano.function([t], [t[3:4], t + 1, t], mode=mode_with_gpu)
     topo = f.maker.fgraph.toposort()
-    assert not any([type(node.op) is tensor.Subtensor for node in topo])
-    assert any([isinstance(node.op, cuda.GpuSubtensor) for node in topo])
+    assert not any( type(node.op) is tensor.Subtensor for node in topo)
+    assert any( isinstance(node.op, cuda.GpuSubtensor) for node in topo)
 
     # Test shared forced on CPU end we do computation on the output of
     # the subtensor.
     t = tensor._shared(numpy.zeros(20, "float32"))
     f = theano.function([], t[3:4] + 1, mode=mode_with_gpu)
     topo = f.maker.fgraph.toposort()
-    assert any([type(node.op) is tensor.Subtensor for node in topo])
-    assert not any([isinstance(node.op, cuda.GpuSubtensor) for node in topo])
-    assert any([isinstance(node.op, cuda.GpuElemwise) for node in topo])
+    assert any( type(node.op) is tensor.Subtensor for node in topo)
+    assert not any( isinstance(node.op, cuda.GpuSubtensor) for node in topo)
+    assert any( isinstance(node.op, cuda.GpuElemwise) for node in topo)
 
 
 def test_local_gpu_split():
@@ -461,14 +461,14 @@ def test_local_gpu_split():
     cpu_res = f([0, 1, 2, 3, 4, 5], [3, 2, 1])
     l = f.maker.fgraph.toposort()
     # Ensure that one op is theano.tensor.Split
-    assert any([isinstance(o.op, theano.tensor.Split) for o in l])
+    assert any( isinstance(o.op, theano.tensor.Split) for o in l)
     # GPU version
     f = theano.function([x, splits], [ra, rb, rc], mode=mode_with_gpu)
     gpu_res = f([0, 1, 2, 3, 4, 5], [3, 2, 1])
     l = f.maker.fgraph.toposort()
-    assert any([isinstance(o.op, cuda.GpuSplit) for o in l])
+    assert any( isinstance(o.op, cuda.GpuSplit) for o in l)
     # Check equality
-    assert all([(cpu == gpu).all() for cpu, gpu in zip(cpu_res, gpu_res)])
+    assert all( (cpu == gpu).all() for cpu, gpu in zip(cpu_res, gpu_res))
 
     # Test the other path of the optimizer, when it is the output that
     # is moved to the GPU.
@@ -477,9 +477,9 @@ def test_local_gpu_split():
                         mode=mode_with_gpu.excluding("InputToGpuOptimizer"))
     gpu_res = f([0, 1, 2, 3, 4, 5], [3, 2, 1])
     l = f.maker.fgraph.toposort()
-    assert any([isinstance(o.op, cuda.GpuSplit) for o in l])
+    assert any( isinstance(o.op, cuda.GpuSplit) for o in l)
     # Check equality
-    assert all([(cpu == gpu).all() for cpu, gpu in zip(cpu_res, gpu_res)])
+    assert all( (cpu == gpu).all() for cpu, gpu in zip(cpu_res, gpu_res))
 
     # Test that split with only 1 output work
     ra = tensor.split(x, splits, n_splits=1, axis=0)
@@ -488,16 +488,16 @@ def test_local_gpu_split():
     l = f.maker.fgraph.toposort()
     # Ensure that no op is theano.tensor.Split or GpuSplit, they get
     # optimized away.
-    assert not any([isinstance(o.op, (theano.tensor.Split,
-                                      cuda.GpuSplit)) for o in l])
+    assert not any( isinstance(o.op, (theano.tensor.Split,
+                                      cuda.GpuSplit)) for o in l)
     # GPU version
     f = theano.function([x, splits], [ra], mode=mode_with_gpu)
     gpu_res = f([0, 1, 2, 3, 4, 5], [6])
     l = f.maker.fgraph.toposort()
-    assert not any([isinstance(o.op, (theano.tensor.Split,
-                                      cuda.GpuSplit)) for o in l])
+    assert not any( isinstance(o.op, (theano.tensor.Split,
+                                      cuda.GpuSplit)) for o in l)
     # Check equality
-    assert all([(cpu == gpu).all() for cpu, gpu in zip(cpu_res, gpu_res)])
+    assert all( (cpu == gpu).all() for cpu, gpu in zip(cpu_res, gpu_res))
 
 
 def test_print_op():

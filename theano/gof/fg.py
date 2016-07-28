@@ -350,9 +350,8 @@ class FunctionGraph(utils.object2):
         if variable in self.variables:
             # If the owner have other outputs still used,
             # then we must keep that variable in the graph.
-            if not variable.owner or not any(
-                [var for var in variable.owner.outputs
-                 if var.clients]):
+            if not variable.owner or not any( var for var in variable.owner.outputs
+                 if var.clients):
 
                 self.variables.remove(variable)
                 # This allow to quickly know if a var is still in the fgraph

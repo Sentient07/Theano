@@ -327,9 +327,9 @@ def get_c_declare(r, name, sub):
     # If some of these have `check_input=True` in their `.op`,
     # it means they need `r`'s dtype to be declared, so
     # we have to pass `check_input=True` to `c_declare`.
-    if ((any([getattr(c.op, 'check_input', config.check_input)
+    if ((any(getattr(c.op, 'check_input', config.check_input)
               for (c, _) in r.clients
-              if not isinstance(c, string_types)]) or
+              if not isinstance(c, string_types)) or
          (r.owner and
           getattr(r.owner.op, 'check_input', config.check_input)))):
         c_declare = r.type.c_declare(name, sub, True)
@@ -364,15 +364,15 @@ def get_c_extract(r, name, sub):
     # checks on the variable.
     # However that code is not used by C code of the apply node creating
     # this variable, so there is no need to check `r.owner.op.check_input`.
-    if any([getattr(c.op, 'check_input', config.check_input)
+    if any( getattr(c.op, 'check_input', config.check_input)
             for (c, _) in r.clients
-            if not isinstance(c, string_types)]):
+            if not isinstance(c, string_types)):
         # check_broadcast is just an hack to easily remove just the
         # broadcast check on the old GPU back-end. This check isn't
         # done in the new GPU back-end or on the CPU.
-        if any([getattr(c.op, 'check_broadcast', True)
+        if any( getattr(c.op, 'check_broadcast', True)
                 for (c, _) in r.clients
-                if not isinstance(c, string_types)]):
+                if not isinstance(c, string_types)):
             c_extract = r.type.c_extract(name, sub, True)
         else:
             try:

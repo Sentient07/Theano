@@ -991,8 +991,8 @@ second dimension
         # This is to protect again futur change of uniq.
         assert len(inames) == len(inputs)
         ii, iii = list(zip(*gof.utils.uniq(list(zip(_inames, node.inputs)))))
-        assert all([x == y for x, y in zip(ii, inames)])
-        assert all([x == y for x, y in zip(iii, inputs)])
+        assert all( x == y for x, y in zip(ii, inames))
+        assert all( x == y for x, y in zip(iii, inputs))
 
         defines = ""
         undefs = ""
@@ -1177,7 +1177,7 @@ second dimension
         # If all inputs and outputs are contiguous
         # and the scalar op define optimized code for that case
         # use it! The scalar_op need to check the broadcast flag himself.
-        if (all([o.ndim >= 1 for o in node.outputs]) and
+        if (all(o.ndim >= 1 for o in node.outputs) and
             # Don't use the contig code for broadcasted scalar.
                 not all(node.outputs[0].broadcastable)):
             contig = None
@@ -1192,9 +1192,9 @@ second dimension
                 # Try to make one generic version, this will help the
                 # compiler to vectorize the code as their won't be as
                 # many ptr and the stride will be hard coded.
-                if all([io.broadcastable == node.outputs[0].broadcastable or
+                if all( io.broadcastable == node.outputs[0].broadcastable or
                         all(io.broadcastable)
-                        for io in node.inputs + node.outputs]):
+                        for io in node.inputs + node.outputs):
                     z = onames[0]
                     contig = """
                     // All output have the same size

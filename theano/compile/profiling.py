@@ -838,8 +838,9 @@ class ProfileStats(object):
                     if (dependencies[ins] and
                             ins not in fgraph.outputs and
                             ins.owner and
-                            all([compute_map[v][0]
-                                 for v in dependencies[ins]])):
+                            all(
+                            compute_map[v][0]
+                                 for v in dependencies[ins])):
                         if ins not in view_of and not viewed_by.get(ins, []):
                             running_memory_size[cg] -= var_mem[ins]
                         elif ins in view_of:
@@ -971,8 +972,9 @@ class ProfileStats(object):
                         if (dependencies[ins] and
                                 ins not in fgraph.outputs and
                                 ins.owner and
-                                all([compute_map[v][0]
-                                     for v in dependencies[ins]])):
+                                all(
+                                compute_map[v][0]
+                                     for v in dependencies[ins])):
                             if (ins not in view_of and
                                     not viewed_by.get(ins, [])):
                                 mem_freed += var_mem[ins]
@@ -1192,8 +1194,8 @@ class ProfileStats(object):
                 code[out] = "v"
             shapes = str(fct_shapes[node.fgraph][node])
 
-            if all([hasattr(out.type, 'get_size')
-                    for out in node.outputs]):
+            if all( hasattr(out.type, 'get_size')
+                    for out in node.outputs):
                 size = "%9dB" % node_outputs_size
                 if node_outputs_size < config.profiling.min_memory_size:
                     N = idx
@@ -1311,7 +1313,7 @@ class ProfileStats(object):
                 return False
             else:
                 l = list_scalar_op(op)
-                return any([s_op.__class__ in [scal.Exp] for s_op in l])
+                return any( s_op.__class__ in [scal.Exp] for s_op in l)
 
         printed_tip = False
         # tip 1
@@ -1320,17 +1322,17 @@ class ProfileStats(object):
             printed_tip = True
 
         # tip 2
-        if not config.lib.amdlibm and any([amdlibm_speed_up(a.op) for a
-                                           in self.apply_time]):
+        if not config.lib.amdlibm and any( amdlibm_speed_up(a.op) for a
+                                           in self.apply_time):
             print("  - Try installing amdlibm and set the Theano flag "
                   "lib.amdlibm=True. This speeds up only some Elemwise "
                   "operation.", file = file)
             printed_tip = True
 
         # tip 3
-        if not config.lib.amdlibm and any([exp_float32_op(a.op) and
+        if not config.lib.amdlibm and any( exp_float32_op(a.op) and
                                            a.inputs[0].dtype == 'float32'
-                                           for a in self.apply_time]):
+                                           for a in self.apply_time):
             print("  - With the default gcc libm, exp in float32 is slower "
                   "than in float64! Try Theano flag floatX=float64, or "
                   "install amdlibm and set the theano flags lib.amdlibm=True", file = file)
@@ -1340,8 +1342,9 @@ class ProfileStats(object):
         for a in self.apply_time:
             node = a
             if (isinstance(node.op, T.Dot) and
-                    all([len(i.type.broadcastable) == 2
-                         for i in node.inputs])):
+                    all(
+                    len(i.type.broadcastable) == 2
+                         for i in node.inputs)):
                 print("  - You have a dot operation that was not optimized to"
                       " dot22 (which is faster). Make sure the inputs are "
                       "float32 or float64, and are the same for both inputs. "

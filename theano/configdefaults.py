@@ -196,7 +196,7 @@ AddConfigVar(
 def filter_nvcc_flags(s):
     assert isinstance(s, str)
     flags = [flag for flag in s.split(' ') if flag]
-    if any([f for f in flags if not f.startswith("-")]):
+    if any( f for f in flags if not f.startswith("-")):
         raise ValueError(
             "Theano nvcc.flags support only parameter/value pairs without"
             " space between them. e.g.: '--machine 64' is not supported,"

@@ -1988,12 +1988,12 @@ class Remove0Tester(utt.InferShapeTester):
                     # list of apply nodes in the optimized graph.
                     nodes = f.maker.fgraph.toposort()
                     # Check there isn't any Remove0 instance not inplace.
-                    assert not any([isinstance(node.op, Remove0) and
-                                    not node.op.inplace for node in nodes]), (
+                    assert not any( isinstance(node.op, Remove0) and
+                                    not node.op.inplace for node in nodes), (
                            'Inplace optimization should have been applied')
                     # Check there is at least one Remove0 inplace.
-                    assert any([isinstance(node.op, Remove0) and node.op.inplace
-                                for node in nodes])
+                    assert any( isinstance(node.op, Remove0) and node.op.inplace
+                                for node in nodes)
                 # checking
                 # makes sense to change its name
                 target = mat

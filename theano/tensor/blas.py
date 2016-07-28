@@ -426,7 +426,7 @@ def _ldflags(ldflags_str, libs, flags, libs_dir, include_dir):
             for f in os.listdir(d):
                 if (f.endswith('.so') or f.endswith('.dylib') or
                         f.endswith('.dll')):
-                    if any([f.find(ll) >= 0 for ll in l]):
+                    if any( f.find(ll) >= 0 for ll in l):
                         found_dyn = True
         if not found_dyn and dirs:
             _logger.warning(
@@ -1924,8 +1924,9 @@ def local_dot22_to_dot22scalar(node):
         # We support only 1 additional level of mul.
         # The canonizer should have merged those mul together.
         i_mul = [x.owner and x.owner.op == T.mul and
-                 any([_as_scalar(x_i, dtype=d.dtype)
-                      for x_i in x.owner.inputs])
+                 any(
+                 _as_scalar(x_i, dtype=d.dtype)
+                      for x_i in x.owner.inputs)
                  for x in node.inputs]
         if not any(i_mul):
             # no scalar in input and no multiplication

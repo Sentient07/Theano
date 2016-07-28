@@ -298,8 +298,8 @@ def test_gpu_contiguous():
     f = theano.function([a, i], gpu_contiguous(a.reshape((5, 4))[::i]),
                         mode=mode_with_gpu)
     topo = f.maker.fgraph.toposort()
-    assert any([isinstance(node.op, GpuSubtensor) for node in topo])
-    assert any([isinstance(node.op, GpuContiguous) for node in topo])
+    assert any( isinstance(node.op, GpuSubtensor) for node in topo)
+    assert any( isinstance(node.op, GpuContiguous) for node in topo)
     assert f(a_val, 1).flags.c_contiguous
     assert f(a_val, 2).flags.c_contiguous
     assert f(a_val, 2).flags.c_contiguous
@@ -349,8 +349,8 @@ class G_Join_and_Split(test_basic.T_Join_and_Split):
         m = self.shared(rng.rand(4, 6).astype(self.floatX))
         o = T.Split(2)(m, 0, [2, 2])
         f = theano.function([], o, mode=self.mode)
-        assert any([isinstance(node.op, self.split_op_class)
-                    for node in f.maker.fgraph.toposort()])
+        assert any( isinstance(node.op, self.split_op_class)
+                    for node in f.maker.fgraph.toposort())
         o1, o2 = f()
         assert numpy.allclose(o1, m.get_value(borrow=True)[:2])
         assert numpy.allclose(o2, m.get_value(borrow=True)[2:])
@@ -401,8 +401,8 @@ def test_gpueye():
         result = numpy.asarray(f(N, M))
         assert numpy.allclose(result, numpy.eye(N, M_, dtype=dtype))
         assert result.dtype == numpy.dtype(dtype)
-        assert any([isinstance(node.op, GpuEye)
-                    for node in f.maker.fgraph.toposort()])
+        assert any( isinstance(node.op, GpuEye)
+                    for node in f.maker.fgraph.toposort())
 
     for dtype in ['float32', 'int32', 'float16']:
         yield check, dtype, 3

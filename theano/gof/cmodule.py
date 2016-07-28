@@ -1606,8 +1606,8 @@ def std_lib_dirs_and_libs():
                              r'EGG-INFO\mingw\usr\x86_64-w64-mingw32\lib')]
             for f, lib in [('libmsvcr90.a',
                             'mingw 4.5.2 or 4.8.1-2 (newer could work)')]:
-                if not any([os.path.exists(os.path.join(tmp_libdir, f))
-                            for tmp_libdir in libdirs]):
+                if not any( os.path.exists(os.path.join(tmp_libdir, f))
+                            for tmp_libdir in libdirs):
                     print(("Your Python version is from Canopy. " +
                            "You need to install the package '" + lib +
                            "' from Canopy package manager."
@@ -2118,7 +2118,7 @@ class GCC_compiler(Compiler):
         # ARM (32-bit and 64-bit) architectures in order to make
         # Theano compatible with the Raspberry Pi, Raspberry Pi 2, or
         # other systems with ARM processors.
-        if (not any(['arm' in flag for flag in cxxflags]) and
+        if (not any( 'arm' in flag for flag in cxxflags) and
                 not any(arch in platform.machine() for arch in ['arm', 'aarch'])):
             n_bits = local_bitwidth()
             cxxflags.append('-m%d' % n_bits)

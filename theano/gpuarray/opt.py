@@ -615,9 +615,9 @@ def local_gpua_subtensor(node, context_name):
                 # And it is a shared var or an input of the graph.
                 not gpu_x.owner.inputs[0].owner):
             if len(x.clients) == 1:
-                if any([n == 'output' or any([isinstance(v.type, GpuArrayType)
-                                              for v in n.inputs + n.outputs])
-                        for n, _ in node.outputs[0].clients]):
+                if any( n == 'output' or any( isinstance(v.type, GpuArrayType)
+                                              for v in n.inputs + n.outputs)
+                        for n, _ in node.outputs[0].clients):
                     return
                 else:
                     return [host_from_gpu(gpu_x.owner.op(node.outputs[0]))]
@@ -988,10 +988,11 @@ def local_gpu_elemwise_careduce(node):
 
 @local_optimizer(None)
 def local_assert_no_cpu_op(node):
-    if (all([var.owner and isinstance(var.owner.op, HostFromGpu)
-             for var in node.inputs]) and
-        any([[c for c in var.clients if isinstance(c[0].op, GpuFromHost)]
-             for var in node.outputs])):
+    if (all(var.owner and isinstance(var.owner.op, HostFromGpu)
+             for var in node.inputs) and
+        any(
+        [c for c in var.clients if isinstance(c[0].op, GpuFromHost)]
+             for var in node.outputs)):
 
             if config.assert_no_cpu_op == "warn":
                 _logger.warning(("CPU Op %s is detected in the computation "

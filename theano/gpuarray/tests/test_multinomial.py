@@ -35,8 +35,8 @@ def test_multinomial_0():
         f = function([p, u], m * 2, allow_input_downcast=True, mode=mode)
 
         if gpu:
-            assert any([type(node.op) is GPUAMultinomialFromUniform
-                        for node in f.maker.fgraph.toposort()])
+            assert any( type(node.op) is GPUAMultinomialFromUniform
+                        for node in f.maker.fgraph.toposort())
 
         # test that both first and second samples can be drawn
         utt.assert_allclose(f([[1, 0], [0, 1]], [.1, .1]),
@@ -69,8 +69,8 @@ def test_multinomial_large():
         m = theano.sandbox.multinomial.MultinomialFromUniform('auto')(p, u)
         f = function([p, u], m * 2, allow_input_downcast=True, mode=mode)
         if gpu:
-            assert any([type(node.op) is GPUAMultinomialFromUniform
-                        for node in f.maker.fgraph.toposort()])
+            assert any( type(node.op) is GPUAMultinomialFromUniform
+                        for node in f.maker.fgraph.toposort())
 
         pval = numpy.arange(10000 * 4,
                             dtype='float32').reshape((10000, 4)) + 0.1
@@ -105,8 +105,8 @@ def test_gpu_opt():
     assert m.dtype == 'float32', m.dtype
 
     f = function([p, u], m, allow_input_downcast=True, mode=get_mode(True))
-    assert any([type(node.op) is GPUAMultinomialFromUniform
-                for node in f.maker.fgraph.toposort()])
+    assert any( type(node.op) is GPUAMultinomialFromUniform
+                for node in f.maker.fgraph.toposort())
     pval = numpy.arange(10000 * 4, dtype='float32').reshape((10000, 4)) + 0.1
     pval = pval / pval.sum(axis=1)[:, None]
     uval = numpy.ones_like(pval[:, 0]) * 0.5
@@ -118,8 +118,8 @@ def test_gpu_opt():
     assert m.dtype == 'float32', m.dtype
 
     f = function([r, u], m, allow_input_downcast=True, mode=get_mode(True))
-    assert any([type(node.op) is GPUAMultinomialFromUniform
-                for node in f.maker.fgraph.toposort()])
+    assert any( type(node.op) is GPUAMultinomialFromUniform
+                for node in f.maker.fgraph.toposort())
     pval = numpy.arange(1 * 4, dtype='float32').reshape((1, 4)) + 0.1
     pval = pval / pval.sum(axis=1)[:, None]
     uval = numpy.ones_like(pval[:, 0]) * 0.5

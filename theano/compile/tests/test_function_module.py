@@ -271,7 +271,7 @@ class T_function(unittest.TestCase):
             l = [val for key, val in storage_map_cpy.items()
                  if key not in i_o_variables or isinstance(key, theano.tensor.Constant)]
             for storage in l:
-                self.assertTrue(any([storage is s for s in ori_storages]))
+                self.assertTrue(any(storage is s for s in ori_storages))
 
             # Assert storages of SharedVariable without updates are shared
             for (input, _1, _2), here, there in zip(ori.indices,
@@ -571,7 +571,7 @@ class T_function(unittest.TestCase):
         for key, val in iteritems(func.fn.storage_map):
             if not isinstance(key, theano.gof.Constant):
                 check_list.append(val)
-        assert any([val[0] for val in check_list])
+        assert any( val[0] for val in check_list)
 
         func.free()
 
@@ -608,10 +608,10 @@ class T_picklefunction(unittest.TestCase):
         self.assertTrue(len(f.defaults) == len(g.defaults))
         # print 'f.defaults = %s' % (f.defaults, )
         # print 'g.defaults = %s' % (g.defaults, )
-        self.assertTrue(all([f_req == g_req and f_feed == g_feed and
+        self.assertTrue(all(f_req == g_req and f_feed == g_feed and
                         f_val == g_val
                         for ((f_req, f_feed, f_val), (g_req, g_feed, g_val)) in zip(
-                            f.defaults, g.defaults)]))
+                            f.defaults, g.defaults)))
 
         self.assertFalse(g.value[1] is f.value[1])  # should not have been copied
         self.assertFalse(g.value[2] is f.value[2])  # should have been copied because it is mutable.

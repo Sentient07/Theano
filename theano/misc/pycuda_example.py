@@ -220,7 +220,7 @@ class PycudaElemwiseSourceModuleOp(GpuOp):
             if i.type.ndim != inputs[0].type.ndim:
                 raise TypeError('different ranks among inputs')
 
-        if any([any(i.type.broadcastable) for i in inputs]):
+        if any( any(i.type.broadcastable) for i in inputs):
             raise Exception("pycuda don't support broadcasted dimensions")
         assert len(inputs) == 2  # TODO remove
 
@@ -313,7 +313,7 @@ class PycudaElemwiseSourceModuleMakeThunkOp(Op):
             if i.type.ndim != inputs[0].type.ndim:
                 raise TypeError('different ranks among inputs')
 
-        if any([any(i.type.broadcastable) for i in inputs]):
+        if any( any(i.type.broadcastable) for i in inputs):
             raise Exception("pycuda don't support broadcasted dimensions")
 
         otype = CudaNdarrayType(broadcastable=[False] * _inputs[0].type.ndim)
@@ -387,8 +387,9 @@ def local_pycuda_gpu_elemwise(node):
        GpuElemwise -> PycudaElemwiseSourceModuleOp
     """
     if isinstance(node.op, GpuElemwise):
-        if (not any([any(i.type.broadcastable) for i in node.inputs]) and
-                all([i.ndim <= 2 for i in node.inputs])):
+        if (not any( any(i.type.broadcastable) for i in node.inputs) and
+                all(
+                i.ndim <= 2 for i in node.inputs)):
             new_op = PycudaElemwiseSourceModuleOp(node.op.scalar_op,
                                                   node.op.inplace_pattern)(
                                                       *node.inputs)

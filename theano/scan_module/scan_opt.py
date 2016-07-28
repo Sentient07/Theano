@@ -276,10 +276,11 @@ class PushOutNonSeqScan(gof.Optimizer):
         for nd in local_fgraph_topo:
             if (  # we haven't already looked at this node
                     nd not in to_remove_set and
-                    all([((x in inner_non_seqs_set) or
+                    all(
+                    ((x in inner_non_seqs_set) or
                         (x.owner in to_remove_set) or
                         isinstance(x, tensor.Constant))
-                        for x in nd.inputs]) and
+                        for x in nd.inputs) and
                     # we can do this because the assumption is that a
                     # viewOp or deepCopyOp will be just at the end of the
                     # function and not somewhere in the middle ..
@@ -484,10 +485,11 @@ class PushOutSeqScan(gof.Optimizer):
 
         for nd in local_fgraph_topo:
             if (nd not in to_remove_set and
-                all([(x in inner_non_seqs_set) or
+                all(
+                (x in inner_non_seqs_set) or
                      (x.owner in to_remove_set) or
                      isinstance(x, tensor.Constant) or
-                     (x in inner_seqs_set) for x in nd.inputs]) and
+                     (x in inner_seqs_set) for x in nd.inputs) and
                     isinstance(nd.op, theano.tensor.Elemwise)):
 
                 outside_ins = []

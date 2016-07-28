@@ -3805,8 +3805,8 @@ class T_Scan(unittest.TestCase):
         f = theano.function([x, A], z)
         topo = f.maker.fgraph.toposort()
         if theano.config.mode != "FAST_COMPILE":
-            assert any([isinstance(node.op, tensor.blas.Dot22)
-                        for node in topo])
+            assert any( isinstance(node.op, tensor.blas.Dot22)
+                        for node in topo)
 
         vx = numpy.array([[1., 1.], [2., 2.]], dtype=theano.config.floatX)
         vA = numpy.array([[1., 1.], [1., 0.]], dtype=theano.config.floatX)
@@ -4612,12 +4612,12 @@ class ScanGpuTests:
         scan_node_topo = scan_node.op.fn.maker.fgraph.toposort()
 
         # check that there is no gpu transfer in the inner loop.
-        assert any([isinstance(node.op, self.gpu_backend.GpuElemwise)
-                    for node in scan_node_topo])
-        assert not any([isinstance(node.op, self.gpu_backend.HostFromGpu)
-                        for node in scan_node_topo])
-        assert not any([isinstance(node.op, self.gpu_backend.GpuFromHost)
-                        for node in scan_node_topo])
+        assert any( isinstance(node.op, self.gpu_backend.GpuElemwise)
+                    for node in scan_node_topo)
+        assert not any( isinstance(node.op, self.gpu_backend.HostFromGpu)
+                        for node in scan_node_topo)
+        assert not any( isinstance(node.op, self.gpu_backend.GpuFromHost)
+                        for node in scan_node_topo)
 
     # This second version test the second case in the optimizer to the gpu.
     def test_one_sequence_one_output_weights_gpu2(self):
@@ -4672,12 +4672,12 @@ class ScanGpuTests:
         scan_node_topo = scan_node.op.fn.maker.fgraph.toposort()
 
         # check that there is no gpu transfer in the inner loop.
-        assert any([isinstance(node.op, self.gpu_backend.GpuElemwise)
-                    for node in scan_node_topo])
-        assert not any([isinstance(node.op, self.gpu_backend.HostFromGpu)
-                        for node in scan_node_topo])
-        assert not any([isinstance(node.op, self.gpu_backend.GpuFromHost)
-                        for node in scan_node_topo])
+        assert any( isinstance(node.op, self.gpu_backend.GpuElemwise)
+                    for node in scan_node_topo)
+        assert not any( isinstance(node.op, self.gpu_backend.HostFromGpu)
+                        for node in scan_node_topo)
+        assert not any( isinstance(node.op, self.gpu_backend.GpuFromHost)
+                        for node in scan_node_topo)
 
     # This third test checks that scan can deal with a mixture of dtypes as
     # outputs when is running on GPU

@@ -48,15 +48,15 @@ def test_pycuda_elemwise_source_module():
                                      pycuda_op_thunk(x, y)),
                                  mode=mode_with_gpu)
 
-            assert any([isinstance(node.op, theano.sandbox.cuda.GpuElemwise)
-                        for node in f.maker.fgraph.toposort()])
-            assert any([isinstance(node.op, PycudaElemwiseSourceModuleOp)
-                        for node in f2.maker.fgraph.toposort()])
-            assert any([isinstance(node.op, PycudaElemwiseSourceModuleOp)
-                        for node in f3.maker.fgraph.toposort()])
-            assert any([isinstance(node.op,
+            assert any( isinstance(node.op, theano.sandbox.cuda.GpuElemwise)
+                        for node in f.maker.fgraph.toposort())
+            assert any( isinstance(node.op, PycudaElemwiseSourceModuleOp)
+                        for node in f2.maker.fgraph.toposort())
+            assert any( isinstance(node.op, PycudaElemwiseSourceModuleOp)
+                        for node in f3.maker.fgraph.toposort())
+            assert any( isinstance(node.op,
                                    PycudaElemwiseSourceModuleMakeThunkOp)
-                        for node in f4.maker.fgraph.toposort()])
+                        for node in f4.maker.fgraph.toposort())
 
             val1 = numpy.asarray(numpy.random.rand(*shape), dtype='float32')
             val2 = numpy.asarray(numpy.random.rand(*shape), dtype='float32')

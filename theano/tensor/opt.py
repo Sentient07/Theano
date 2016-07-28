@@ -331,8 +331,9 @@ def inplace_elemwise_optimizer_op(OP):
                             updated_vars.append(inp_idx)
                         elif (hasattr(fgraph, 'destroy_handler') and
                               inp.owner and
-                              any([fgraph.destroy_handler.root_destroyer.get(up_inp, None) is inp.owner
-                                   for up_inp in updated_inputs])):
+                              any(
+                              fgraph.destroy_handler.root_destroyer.get(up_inp, None) is inp.owner
+                                   for up_inp in updated_inputs)):
 
                             # the candidate input is a variable computed
                             # inplace on the updated input via a sequence of
@@ -1116,14 +1117,14 @@ class ShapeFeature(object):
                     shape_vars.append(self.lscalar_one)
                 else:
                     shape_vars.append(self.unpack(s[i]))
-            assert all([not hasattr(r.type, "broadcastable") or
+            assert all( not hasattr(r.type, "broadcastable") or
                         not r.type.broadcastable[i] or
                         # The two following comparison are a speed optimization
                         # But we never timed this speed optimization!
                         self.lscalar_one.equals(shape_vars[i]) or
                         self.lscalar_one.equals(
                             T.extract_constant(shape_vars[i]))
-                        for i in xrange(r.ndim)])
+                        for i in xrange(r.ndim))
             self.shape_of[r] = tuple(shape_vars)
             for sv in shape_vars:
                 self.shape_of_reverse_index.setdefault(sv, set()).add(r)
@@ -1194,7 +1195,7 @@ class ShapeFeature(object):
                 merged_shape.append(r_shape[i])
             else:
                 merged_shape.append(other_shape[i])
-        assert all([(not hasattr(r.type, "broadcastable") or
+        assert all( (not hasattr(r.type, "broadcastable") or
                      not r.type.broadcastable[i] and
                      not other_r.type.broadcastable[i]) or
                     # The two following comparison are a speed optimization
@@ -1202,7 +1203,7 @@ class ShapeFeature(object):
                     self.lscalar_one.equals(merged_shape[i]) or
                     self.lscalar_one.equals(
                         T.extract_constant(merged_shape[i], only_process_constants=True))
-                    for i in xrange(r.ndim)])
+                    for i in xrange(r.ndim))
         self.shape_of[r] = tuple(merged_shape)
         for sv in self.shape_of[r]:
             self.shape_of_reverse_index.setdefault(sv, set()).add(r)
@@ -1219,13 +1220,13 @@ class ShapeFeature(object):
                 new_shape.append(self.unpack(s_i))
             else:
                 new_shape.append(s_j)
-        assert all([not hasattr(r.type, "broadcastable") or
+        assert all( not hasattr(r.type, "broadcastable") or
                     not r.type.broadcastable[idx] or
                     # The two following comparison are a speed optimization
                     # But we never timed this speed optimization!
                     self.lscalar_one.equals(new_shape[idx]) or
                     self.lscalar_one.equals(T.extract_constant(new_shape[idx]))
-                    for idx in xrange(r.ndim)])
+                    for idx in xrange(r.ndim))
         self.shape_of[r] = tuple(new_shape)
         for sv in self.shape_of[r]:
             self.shape_of_reverse_index.setdefault(sv, set()).add(r)
@@ -1490,14 +1491,14 @@ def local_elemwise_alloc_op(ElemwiseOP, AllocOP, DimShuffleOP):
         if len(node.outputs) > 1:
             # Ensure all outputs have the same broadcast pattern
             # This is a supposition that I'm not sure is always true.
-            assert all([o.type.broadcastable ==
+            assert all( o.type.broadcastable ==
                         node.outputs[0].type.broadcastable for o in
-                        node.outputs[1:]])
+                        node.outputs[1:])
 
         # The broadcast pattern of the ouptut must match the broadcast
         # pattern of at least one of the inputs.
-        if not any([i.type.broadcastable ==
-                    node.outputs[0].type.broadcastable for i in node.inputs]):
+        if not any( i.type.broadcastable ==
+                    node.outputs[0].type.broadcastable for i in node.inputs):
             return False
 
         def dimshuffled_alloc(i):
@@ -1508,8 +1509,8 @@ def local_elemwise_alloc_op(ElemwiseOP, AllocOP, DimShuffleOP):
         # At least one input must have an owner that is either a AllocOP or a
         # DimShuffleOP with an owner that is a AllocOP -- otherwise there is
         # nothing to optimize.
-        if not any([i.owner and (isinstance(i.owner.op, AllocOP) or
-                                 dimshuffled_alloc(i)) for i in node.inputs]):
+        if not any( i.owner and (isinstance(i.owner.op, AllocOP) or
+                                 dimshuffled_alloc(i)) for i in node.inputs):
             return False
 
         # Search for input that we can use as a baseline for the dimensions.
@@ -2636,7 +2637,7 @@ def local_subtensor_lift(node):
 
         if isinstance(u.owner.op, T.Elemwise):
             new_inputs = []
-            if all([sum(i.type.broadcastable) == 0 for i in u.owner.inputs]):
+            if all( sum(i.type.broadcastable) == 0 for i in u.owner.inputs):
                 # There is no broadcastable in the inputs
                 idx = node.inputs[1:]
                 new_inputs = [node.op(i, *idx) for i in u.owner.inputs]
@@ -2648,8 +2649,8 @@ def local_subtensor_lift(node):
                 # and stacktrace from previous unary operation
                 copy_stack_trace([node.outputs[0], node.inputs[0]], ret)
                 return [ret]
-            elif all([sum(i.type.broadcastable) in [i.ndim, 0]
-                      for i in u.owner.inputs]):
+            elif all( sum(i.type.broadcastable) in [i.ndim, 0]
+                      for i in u.owner.inputs):
                 # There is no broadcastable in the inputs or it is scalar
                 idx = node.inputs[1:]
                 new_inputs = []
@@ -4893,8 +4894,9 @@ def local_useless_elemwise_comparison(node):
        node.inputs[0].owner and \
        isinstance(node.inputs[0].owner.op, Elemwise) and \
        isinstance(node.inputs[0].owner.op.scalar_op, scalar.Add) and \
-       all([isinstance(var.owner and var.owner.op, Shape_i)
-            for var in node.inputs[0].owner.inputs]) and \
+       all( \
+       isinstance(var.owner and var.owner.op, Shape_i)
+            for var in node.inputs[0].owner.inputs) and \
        T.extract_constant(node.inputs[1], only_process_constants=True) == 0:
 
         return [T.zeros_like(node.inputs[0], dtype=node.outputs[0].dtype)]
@@ -4903,8 +4905,9 @@ def local_useless_elemwise_comparison(node):
        node.inputs[0].owner and \
        isinstance(node.inputs[0].owner.op, Elemwise) and \
        isinstance(node.inputs[0].owner.op.scalar_op, scalar.Add) and \
-       all([isinstance(var.owner and var.owner.op, Shape_i)
-            for var in node.inputs[0].owner.inputs]) and \
+       all( \
+       isinstance(var.owner and var.owner.op, Shape_i)
+            for var in node.inputs[0].owner.inputs) and \
        T.extract_constant(node.inputs[1], only_process_constants=True) == 0:
         return [T.ones_like(node.inputs[0], dtype=node.outputs[0].dtype)]
 

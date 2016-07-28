@@ -259,8 +259,8 @@ def dtype_in_elemwise_supported(op):
         if isinstance(op.scalar_op, theano.scalar.Composite):
             scals = get_all_basic_scalar(op.scalar_op)
             for s in scals:
-                if any([i.type.dtype not in elemwise_cuda_dtype_supported
-                        for i in s.inputs + s.outputs]):
+                if any( i.type.dtype not in elemwise_cuda_dtype_supported
+                        for i in s.inputs + s.outputs):
                     return False
     return True
 
@@ -275,10 +275,10 @@ def local_gpu_elemwise_0(node):
     """
     if (isinstance(node.op, tensor.Elemwise) and
             dtype_in_elemwise_supported(node.op)):
-        if any([i.owner and
+        if any( i.owner and
                 isinstance(i.owner.op, HostFromGpu)
-                for i in node.inputs]):
-            if all([o.type.dtype == 'float32' for o in node.outputs]):
+                for i in node.inputs):
+            if all( o.type.dtype == 'float32' for o in node.outputs):
                 # Don't set any inplace pattern.
                 # gpu_inplace_elemwise_optimizer will do it later
 
@@ -297,15 +297,15 @@ def local_gpu_elemwise_0(node):
                 upcastable = set(['float32', 'int8', 'int16', 'uint8',
                                   'uint16'])
                 # case 1 - all inputs are already float32
-                if all([i.type.dtype == 'float32' for i in node.inputs]):
+                if all( i.type.dtype == 'float32' for i in node.inputs):
                     # TODO: change this when fusion makes Elemwise with
                     # multiple outputs
                     gpu_elemwise = new_op(*(as_cuda_ndarray_variable(i)
                                             for i in node.inputs),
                                           return_list=True)
                 # case 2 - it is still ok if some inputs were upcast to float32
-                elif all([i.type.dtype in upcastable
-                          for i in node.inputs]):
+                elif all( i.type.dtype in upcastable
+                          for i in node.inputs):
                     # second - establish that a new node with upcasted inputs
                     # has the same outputs types as the original node
                     upcasted = node.op.make_node(*[tensor.cast(i, 'float32')
@@ -359,7 +359,7 @@ def local_gpu_elemwise_1(node):
                     # This happens when scalar_op requires support code
                     return False
 
-            if all([i.dtype == 'float32' for i in elemwise_node.inputs]):
+            if all( i.dtype == 'float32' for i in elemwise_node.inputs):
                 gpu_elemwise = new_op(*[as_cuda_ndarray_variable(i)
                                         for i in elemwise_node.inputs])
                 gpu_elemwise = split_huge_add_or_mul(gpu_elemwise.owner)
@@ -481,8 +481,8 @@ def local_gpu_dot_to_dot22(node):
     if isinstance(node.op, tensor.basic.Dot):
         if node.outputs[0].type.dtype != 'float32':
             return False
-        if any([i.owner and isinstance(i.owner.op, HostFromGpu)
-                for i in node.inputs]):
+        if any( i.owner and isinstance(i.owner.op, HostFromGpu)
+                for i in node.inputs):
             x, y = node.inputs
             if _is_real_vector(x) and _is_real_matrix(y):
                 new_op = GpuDimShuffle((False,), ('x', 0))
@@ -506,10 +506,12 @@ def local_gpu_dot_to_dot22(node):
 @local_optimizer(None)
 def local_assert_no_cpu_op(node):
     if (not isinstance(node.op, GpuOp) and
-        all([var.owner and isinstance(var.owner.op, HostFromGpu)
-             for var in node.inputs]) and
-        any([[c for c in var.clients if isinstance(c[0].op, GpuFromHost)]
-             for var in node.outputs])):
+        all(
+        var.owner and isinstance(var.owner.op, HostFromGpu)
+             for var in node.inputs) and
+        any(
+        [c for c in var.clients if isinstance(c[0].op, GpuFromHost)]
+             for var in node.outputs)):
 
             if config.assert_no_cpu_op == "warn":
                 _logger.warning(("CPU op %s is detected in the computational"
@@ -542,18 +544,17 @@ def local_gpu_lazy_ifelse(node):
         gpu_ifelse = theano.ifelse.IfElse(node.op.n_outs, gpu=True)
         outs_clients = reduce(list.__add__,
                               [out.clients for out in node.outputs])
-        if any([(i.owner and isinstance(i.owner.op, HostFromGpu))
-                for i in node.inputs]) or any(
-                    [c != 'output' and c.op == gpu_from_host for c, idx
-                     in outs_clients]):
+        if any( (i.owner and isinstance(i.owner.op, HostFromGpu))
+                for i in node.inputs) or any( c != 'output' and c.op == gpu_from_host for c, idx
+                     in outs_clients):
 
             c = node.inputs[0]
             outs = node.inputs[1:]
             # Should not happen, but just in case
             if isinstance(c.type, CudaNdarrayType):
                 c = host_from_gpu(c)
-            if all([isinstance(o.type, CudaNdarrayType) or o.dtype != 'float32'
-                    for o in outs]):
+            if all( isinstance(o.type, CudaNdarrayType) or o.dtype != 'float32'
+                    for o in outs):
                 return
 
             for i in range(len(outs)):
@@ -584,8 +585,8 @@ def local_gpu_lazy_ifelse(node):
             # Should not happen, but just in case
             if isinstance(c.type, CudaNdarrayType):
                 c = host_from_gpu(c)
-            if all([isinstance(o.type, CudaNdarrayType) or o.dtype != 'float32'
-                    for o in outs]):
+            if all( isinstance(o.type, CudaNdarrayType) or o.dtype != 'float32'
+                    for o in outs):
                 return
 
             for i in range(len(outs)):
@@ -615,8 +616,8 @@ def local_gpu_dot22(node):
             return [gpu_dot22(as_cuda_ndarray_variable(x),
                               as_cuda_ndarray_variable(y))]
     if isinstance(node.op, tensor.blas.Dot22):
-        if any([(i.owner and isinstance(i.owner.op, HostFromGpu))
-                for i in node.inputs]):
+        if any( (i.owner and isinstance(i.owner.op, HostFromGpu))
+                for i in node.inputs):
             x, y = node.inputs
             return [host_from_gpu(gpu_dot22(as_cuda_ndarray_variable(x),
                                             as_cuda_ndarray_variable(y)))]
@@ -655,8 +656,8 @@ def local_gpu_batched_dot(node):
             x, y = host_input.owner.inputs
             return [gpu_batched_dot(x, y)]
     if isinstance(node.op, tensor.blas.BatchedDot):
-        if any([(i.owner and isinstance(i.owner.op, HostFromGpu))
-                for i in node.inputs]):
+        if any( (i.owner and isinstance(i.owner.op, HostFromGpu))
+                for i in node.inputs):
             x, y = node.inputs
             return [host_from_gpu(gpu_batched_dot(x, y))]
     return False
@@ -681,8 +682,8 @@ def local_gpu_dot22scalar(node):
                                     as_cuda_ndarray_variable(y),
                                     tensor.blas._as_scalar(scalar))]
     if isinstance(node.op, tensor.blas.Dot22Scalar):
-        if any([i.owner and isinstance(i.owner.op, HostFromGpu)
-                for i in node.inputs]):
+        if any( i.owner and isinstance(i.owner.op, HostFromGpu)
+                for i in node.inputs):
             x, y, scalar = node.inputs
             return [host_from_gpu(
                 gpu_dot22scalar(as_cuda_ndarray_variable(x),
@@ -710,8 +711,8 @@ def local_gpu_solve(node):
                               as_cuda_ndarray_variable(y))]
 
     if isinstance(node.op, slinalg.Solve):
-        if any([i.owner and isinstance(i.owner.op, HostFromGpu)
-                for i in node.inputs]):
+        if any( i.owner and isinstance(i.owner.op, HostFromGpu)
+                for i in node.inputs):
             x, y = node.inputs
             return [host_from_gpu(
                     gpu_solve(as_cuda_ndarray_variable(x),
@@ -859,8 +860,8 @@ def local_gpu_careduce(node):
             # below do not support when x.ndim == 0.
             if x.type == node.outputs[0].type:
                 return [x]
-            elif (all([c != "output" and isinstance(c.op, GpuFromHost)
-                      for c, i in node.outputs[0].clients]) and
+            elif (all(c != "output" and isinstance(c.op, GpuFromHost)
+                      for c, i in node.outputs[0].clients) and
                   x.owner and x.owner.op.__class__ in
                   cpu_ops_moved_to_gpu):
                 # It is not always good to transfer the reduction to
@@ -1069,8 +1070,8 @@ def local_gpu_subtensor(node):
                     isinstance(gpu_x.owner.op, GpuFromHost)):
 
                 if len(x.clients) == 1:
-                    if any([n == 'output' or isinstance(n.op, GpuOp)
-                            for n, _ in node.outputs[0].clients]):
+                    if any( n == 'output' or isinstance(n.op, GpuOp)
+                            for n, _ in node.outputs[0].clients):
                         return
                     else:
                         return [host_from_gpu(as_cuda_ndarray_variable(
@@ -2180,16 +2181,16 @@ def local_gpualloc(node):
         if node.inputs[0].owner and \
            isinstance(node.inputs[0].owner.op, HostFromGpu):
             replace = True
-        elif all([c != 'output' and c.op == gpu_from_host
-                  for c, idx in node.outputs[0].clients]):
+        elif all( c != 'output' and c.op == gpu_from_host
+                  for c, idx in node.outputs[0].clients):
             # if all clients are on gpu
             replace = True
-        elif all([c != 'output' and
+        elif all( c != 'output' and
                   c.op == tensor.join and
                   all(i.owner and
                       i.owner.op in [host_from_gpu, tensor.alloc]
                       for i in c.inputs[1:])
-                  for c, idx in node.outputs[0].clients]):
+                  for c, idx in node.outputs[0].clients):
             # if the client is on gpu or alloc
             replace = True
         if replace and node.inputs[0].dtype != 'float32':
@@ -2298,8 +2299,8 @@ def local_gpu_eye(node):
                 return
             return [gpu_eye(*host_input.owner.inputs)]
     if isinstance(node.op, tensor.Eye) and node.op.dtype == "float32":
-        if any([(i.owner and isinstance(i.owner.op, HostFromGpu))
-                for i in node.inputs]):
+        if any( (i.owner and isinstance(i.owner.op, HostFromGpu))
+                for i in node.inputs):
             if tensor.extract_constant(node.inputs[2]) != 0:
                 return
             return [host_from_gpu(gpu_eye(*node.inputs))]
@@ -2479,8 +2480,8 @@ def gpuScanOptimization(node):
     if (type(node.op) == scan_op.Scan and
             not node.op.info['gpu']):
 
-        if any([(i.owner and isinstance(i.owner.op, HostFromGpu))
-                for i in node.inputs]):
+        if any( (i.owner and isinstance(i.owner.op, HostFromGpu))
+                for i in node.inputs):
 
             thescan = node.op
             info = copy.deepcopy(thescan.info)

@@ -380,8 +380,8 @@ def makeTester(name, op, expected, checks=None, good=None, bad_build=None,
                     expecteds = self.expected(*inputs)
                     eps = 1e-10
 
-                if any([i.dtype in ('float32', 'int8', 'uint8')
-                        for i in inputs]):
+                if any( i.dtype in ('float32', 'int8', 'uint8')
+                        for i in inputs):
                     eps = 1e-6
                 eps = numpy.max([eps, _eps])
 
@@ -4189,8 +4189,8 @@ class T_Join_and_Split(unittest.TestCase):
         m = self.shared(rng.rand(4, 6).astype(self.floatX))
         o = self.split_op_class(2)(m, 0, [4, 0])
         f = function([], o, mode=self.mode)
-        assert any([isinstance(node.op, self.split_op_class)
-                    for node in f.maker.fgraph.toposort()])
+        assert any( isinstance(node.op, self.split_op_class)
+                    for node in f.maker.fgraph.toposort())
         o1, o2 = f()
         assert numpy.allclose(o1, m.get_value(borrow=True))
         assert numpy.allclose(o2, m.get_value(borrow=True)[4:])
@@ -4200,8 +4200,8 @@ class T_Join_and_Split(unittest.TestCase):
         m = self.shared(rng.rand(4, 6).astype(self.floatX))
         o = self.split_op_class(2)(m, 0, [5, -1])
         f = function([], o, mode=self.mode)
-        assert any([isinstance(node.op, self.split_op_class)
-                    for node in f.maker.fgraph.toposort()])
+        assert any( isinstance(node.op, self.split_op_class)
+                    for node in f.maker.fgraph.toposort())
         self.assertRaises(ValueError, f)
 
 

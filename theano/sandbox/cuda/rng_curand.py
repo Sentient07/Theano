@@ -323,8 +323,8 @@ class CURAND_RandomStreams(object):
         """
         if isinstance(size, tuple):
             msg = "size must be a tuple of int or a Theano variable"
-            assert all([isinstance(i, int) or isinstance(i, Variable)
-                        for i in size]), msg
+            assert all( isinstance(i, int) or isinstance(i, Variable)
+                        for i in size), msg
         else:
             msg = "size must be a tuple of int or a Theano variable"
             assert isinstance(size, Variable) and size.ndim == 1, msg
@@ -355,8 +355,8 @@ class CURAND_RandomStreams(object):
         """
         if isinstance(size, tuple):
             msg = "size must be a tuple of int or a Theano variable"
-            assert all([isinstance(i, int) or isinstance(i, Variable)
-                        for i in size]), msg
+            assert all( isinstance(i, int) or isinstance(i, Variable)
+                        for i in size), msg
         else:
             msg = "size must be a tuple of int or a Theano variable"
             assert isinstance(size, Variable) and size.ndim == 1, msg

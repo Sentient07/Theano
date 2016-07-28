@@ -204,14 +204,14 @@ class test_ifelse(unittest.TestCase, utt.TestOptimizationMixin):
         values = [numpy.asarray(rng.uniform(size=(l,)), theano.config.floatX)
                   for l in lens]
         outs_1 = f(1, *values)
-        assert all([x.shape[0] == y for x, y in zip(outs_1, lens)])
+        assert all( x.shape[0] == y for x, y in zip(outs_1, lens))
         assert numpy.all(outs_1[0] == 1.)
         assert numpy.all(outs_1[1] == 1.)
         assert numpy.all(outs_1[2] == 0.)
         assert numpy.all(outs_1[3] == 0.)
 
         outs_0 = f(0, *values)
-        assert all([x.shape[0] == y for x, y in zip(outs_1, lens)])
+        assert all( x.shape[0] == y for x, y in zip(outs_1, lens))
         assert numpy.all(outs_0[0] == 0.)
         assert numpy.all(outs_0[1] == 0.)
         assert numpy.all(outs_0[2] == 1.)

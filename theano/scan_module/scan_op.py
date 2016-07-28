@@ -2010,7 +2010,8 @@ class Scan(PureOp):
             out_indices = [get_out_idx(self_outputs.index(y)) for y in y_s]
 
             connected_inputs = [i for i in range(len(scan_node.inputs)) if
-                                any([connection_pattern[i][odx] for odx in out_indices])]
+                                any(
+                                connection_pattern[i][odx] for odx in out_indices)]
 
             wrt = [x for x in theano.gof.graph.inputs(y_s) if
                    (x in diff_inputs) and
@@ -2843,8 +2844,8 @@ def profile_printer(fct_name, compile_time, fct_call_time, fct_call,
                     apply_time, apply_cimpl, message, outputs_size,
                     other_time):
     # Scan overhead profile
-    if any([isinstance(node.op, Scan) and v > 0 for (_, node), v in
-            apply_time.items()]):
+    if any( isinstance(node.op, Scan) and v > 0 for (_, node), v in
+            apply_time.items()):
         print()
         print('Scan overhead:')
         print ('<Scan op time(s)> <sub scan fct time(s)> <sub scan op '

@@ -360,8 +360,9 @@ class TestPushOutSumOfDot():
 
         for output in scan_node_grad.op.outputs:
             assert not (isinstance(output.owner.op, T.elemwise.Elemwise) and
-                        any([isinstance(i, T.Dot) for i
-                             in output.owner.inputs]))
+                        any(
+                        isinstance(i, T.Dot) for i
+                             in output.owner.inputs))
 
         # Compare the outputs of the two functions on the same input data.
         f_opt_output = f_opt(x_value, ri_value, zi_value)

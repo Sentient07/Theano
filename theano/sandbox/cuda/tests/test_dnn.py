@@ -143,7 +143,7 @@ def test_dnn_conv_inplace():
     topo = f.maker.fgraph.toposort()
     convs = [n for n in topo if isinstance(n.op, dnn.GpuDnnConv)]
     assert len(convs) == 2
-    assert all([node.op.inplace for node in convs])
+    assert all( node.op.inplace for node in convs)
     assert len([n for n in topo if isinstance(n.op, GpuAllocEmpty)]) == 2
 
     # Test grad w op
@@ -154,7 +154,7 @@ def test_dnn_conv_inplace():
     topo = f.maker.fgraph.toposort()
     convs = [n for n in topo if isinstance(n.op, dnn.GpuDnnConvGradW)]
     assert len(convs) == 2
-    assert all([node.op.inplace for node in convs])
+    assert all( node.op.inplace for node in convs)
     assert len([n for n in topo if isinstance(n.op, GpuAllocEmpty)]) == 2
 
     # Test grad i op
@@ -165,7 +165,7 @@ def test_dnn_conv_inplace():
     topo = f.maker.fgraph.toposort()
     convs = [n for n in topo if isinstance(n.op, dnn.GpuDnnConvGradI)]
     assert len(convs) == 2
-    assert all([node.op.inplace for node in convs])
+    assert all( node.op.inplace for node in convs)
     assert len([n for n in topo if isinstance(n.op, GpuAllocEmpty)]) == 2
 
 
@@ -265,11 +265,11 @@ def test_pooling():
                 mode_without_gpu2 = mode_without_gpu.including()
                 mode_without_gpu2.check_isfinite = False
                 f1 = theano.function([x], out1, mode=mode_with_gpu)
-                assert any([isinstance(node.op, cuda.dnn.GpuDnnPool)
-                            for node in f1.maker.fgraph.apply_nodes])
+                assert any( isinstance(node.op, cuda.dnn.GpuDnnPool)
+                            for node in f1.maker.fgraph.apply_nodes)
                 f2 = theano.function([x], out2, mode=mode_without_gpu2)
-                assert not any([isinstance(node.op, cuda.dnn.GpuDnnPool)
-                                for node in f2.maker.fgraph.apply_nodes])
+                assert not any( isinstance(node.op, cuda.dnn.GpuDnnPool)
+                                for node in f2.maker.fgraph.apply_nodes)
                 for shp in [(1, 10, 100, 100),
                             (1, 3, 99, 99),
                             (32, 1, 147, 197),
@@ -301,8 +301,8 @@ def test_pooling():
             # Confirm that the opt would have inserted it.
             fg = theano.function([x], theano.grad(fn(x).sum(), x),
                                  mode=mode_with_gpu)
-            assert any([isinstance(node.op, cuda.dnn.GpuDnnPoolGrad)
-                        for node in fg.maker.fgraph.toposort()])
+            assert any( isinstance(node.op, cuda.dnn.GpuDnnPoolGrad)
+                        for node in fg.maker.fgraph.toposort())
 
             # Test the GPU grad + GPU implementation
             def fn(x):
@@ -319,8 +319,8 @@ def test_pooling():
             # Confirm that we get the good op.
             fg = theano.function([x], theano.grad(fn(x).sum(), x),
                                  mode=mode_with_gpu)
-            assert any([isinstance(node.op, cuda.dnn.GpuDnnPoolGrad)
-                        for node in fg.maker.fgraph.toposort()])
+            assert any( isinstance(node.op, cuda.dnn.GpuDnnPoolGrad)
+                        for node in fg.maker.fgraph.toposort())
             g_out = fg(data)
 
             # Compare again the CPU result
@@ -330,11 +330,11 @@ def test_pooling():
             fc = theano.function([x], theano.grad(out.sum(), x),
                                  mode=mode_without_gpu)
             if mode == 'max':
-                assert any([isinstance(node.op, MaxPoolGrad)
-                            for node in fc.maker.fgraph.toposort()])
+                assert any( isinstance(node.op, MaxPoolGrad)
+                            for node in fc.maker.fgraph.toposort())
             else:
-                assert any([isinstance(node.op, AveragePoolGrad)
-                            for node in fc.maker.fgraph.toposort()])
+                assert any( isinstance(node.op, AveragePoolGrad)
+                            for node in fc.maker.fgraph.toposort())
             c_out = fc(data)
             utt.assert_allclose(c_out, g_out)
 
@@ -368,8 +368,8 @@ def test_pooling_with_tensor_vars():
     mode_without_gpu2.check_isfinite = False
 
     f_gpu = theano.function([x], fn(x), mode=mode_with_gpu)
-    assert any([isinstance(node.op, cuda.dnn.GpuDnnPool)
-                for node in f_gpu.maker.fgraph.apply_nodes])
+    assert any( isinstance(node.op, cuda.dnn.GpuDnnPool)
+                for node in f_gpu.maker.fgraph.apply_nodes)
 
     i = 1
     for shp in [(1, 10, 100, 100),
@@ -381,8 +381,8 @@ def test_pooling_with_tensor_vars():
                           pool_function=T.max)
 
         f_cpu = theano.function([x], out, mode=mode_without_gpu2)
-        assert not any([isinstance(node.op, cuda.dnn.GpuDnnPool)
-                        for node in f_cpu.maker.fgraph.apply_nodes])
+        assert not any( isinstance(node.op, cuda.dnn.GpuDnnPool)
+                        for node in f_cpu.maker.fgraph.apply_nodes)
 
         # Change the window size dynamically for gpu op
         ws.set_value(numpy.array([i, i]).astype('int32'))
@@ -457,11 +457,11 @@ def test_pooling3d():
                                 pad=pad, pool_func=func)
 
                 f1 = theano.function([x], out1, mode=mode_with_gpu)
-                assert any([isinstance(node.op, cuda.dnn.GpuDnnPool)
-                            for node in f1.maker.fgraph.apply_nodes])
+                assert any( isinstance(node.op, cuda.dnn.GpuDnnPool)
+                            for node in f1.maker.fgraph.apply_nodes)
                 f2 = theano.function([x], out2, mode=mode_without_gpu_ref)
-                assert not any([isinstance(node.op, cuda.dnn.GpuDnnPool)
-                                for node in f2.maker.fgraph.apply_nodes])
+                assert not any( isinstance(node.op, cuda.dnn.GpuDnnPool)
+                                for node in f2.maker.fgraph.apply_nodes)
                 for shp in [(1, 10, 100, 100, 100),
                             (1, 3, 99, 99, 99),
                             (32, 1, 147, 197, 37),
@@ -505,8 +505,8 @@ def test_pooling3d():
             # Confirm that we get the good op.
             fg = theano.function([x], theano.grad(fn(x).sum(), x),
                                  mode=mode_with_gpu)
-            assert any([isinstance(node.op, cuda.dnn.GpuDnnPoolGrad)
-                        for node in fg.maker.fgraph.toposort()])
+            assert any( isinstance(node.op, cuda.dnn.GpuDnnPoolGrad)
+                        for node in fg.maker.fgraph.toposort())
             g_out = fg(data)
 
             # Compare again the CPU result
@@ -530,8 +530,8 @@ def test_pooling_opt():
         pool_2d(x, ds=(2, 2), mode='average_inc_pad', ignore_border=True),
         mode=mode_with_gpu)
 
-    assert any([isinstance(n.op, cuda.dnn.GpuDnnPool)
-                for n in f.maker.fgraph.toposort()])
+    assert any( isinstance(n.op, cuda.dnn.GpuDnnPool)
+                for n in f.maker.fgraph.toposort())
 
     f(numpy.zeros((10, 10), dtype='float32'))
 
@@ -541,8 +541,8 @@ def test_pooling_opt():
                        ignore_border=True).sum(), x),
         mode=mode_with_gpu.including("cudnn"))
 
-    assert any([isinstance(n.op, cuda.dnn.GpuDnnPoolGrad)
-                for n in f.maker.fgraph.toposort()])
+    assert any( isinstance(n.op, cuda.dnn.GpuDnnPoolGrad)
+                for n in f.maker.fgraph.toposort())
 
     f(numpy.zeros((10, 10), dtype='float32'))
 
@@ -745,8 +745,8 @@ def test_dnn_tag():
 
     if not raised:
         assert cuda.dnn.dnn_available()
-        assert any([isinstance(n.op, cuda.dnn.GpuDnnPool)
-                    for n in f.maker.fgraph.toposort()])
+        assert any( isinstance(n.op, cuda.dnn.GpuDnnPool)
+                    for n in f.maker.fgraph.toposort())
 
 
 class TestDnnInferShapes(utt.InferShapeTester):

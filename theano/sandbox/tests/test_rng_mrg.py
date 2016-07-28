@@ -560,8 +560,8 @@ def test_uniform():
         u = R.uniform(size=size,
                       nstreams=rng_mrg.guess_n_streams(size, warn=False))
         f = theano.function(var_input, u, mode=mode)
-        assert any([isinstance(node.op, theano.sandbox.rng_mrg.mrg_uniform)
-                    for node in f.maker.fgraph.toposort()])
+        assert any( isinstance(node.op, theano.sandbox.rng_mrg.mrg_uniform)
+                    for node in f.maker.fgraph.toposort())
         # theano.printing.debugprint(f)
         cpu_out = f(*input)
 
@@ -587,9 +587,9 @@ def test_uniform():
             f = theano.function(var_input, theano.Out(
                 theano.sandbox.cuda.basic_ops.gpu_from_host(u),
                 borrow=True), mode=mode_with_gpu)
-            assert any([isinstance(node.op,
+            assert any( isinstance(node.op,
                                    theano.sandbox.rng_mrg.GPU_mrg_uniform)
-                        for node in f.maker.fgraph.toposort()])
+                        for node in f.maker.fgraph.toposort())
             # theano.printing.debugprint(f)
             gpu_out = numpy.asarray(f(*input))
 

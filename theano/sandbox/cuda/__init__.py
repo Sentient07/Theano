@@ -27,7 +27,7 @@ gpu_seqopt = SequenceDB()
 
 
 def register_opt(*tags, **kwargs):
-    if any([not isinstance(t, str) for t in tags]):
+    if any( not isinstance(t, str) for t in tags):
         raise RuntimeError("Bad call to register_opt."
                            " All tags must be strings.", tags)
 

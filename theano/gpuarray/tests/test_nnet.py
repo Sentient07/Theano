@@ -65,12 +65,12 @@ def test_GpuCrossentropySoftmaxArgmax1HotWithBias():
                                    outputs=[loss, y_pred, dW],
                                    mode=mode_with_gpu)
 
-    assert any([isinstance(node.op,
+    assert any( isinstance(node.op,
                            T.nnet.CrossentropySoftmaxArgmax1HotWithBias)
-                for node in classify.maker.fgraph.toposort()])
-    assert any([isinstance(node.op,
+                for node in classify.maker.fgraph.toposort())
+    assert any( isinstance(node.op,
                            GpuCrossentropySoftmaxArgmax1HotWithBias)
-                for node in classify_gpu.maker.fgraph.toposort()])
+                for node in classify_gpu.maker.fgraph.toposort())
 
     out = classify(yy, b_values, dot_value)
     gout = classify_gpu(yy, b_values, dot_value)
@@ -115,11 +115,11 @@ def test_GpuCrossentropySoftmax1HotWithBiasDx():
     # theano.printing.debugprint(cpu_f)
     # theano.printing.debugprint(gpu_f)
 
-    assert any([isinstance(node.op, T.nnet.CrossentropySoftmax1HotWithBiasDx)
-                for node in cpu_f.maker.fgraph.toposort()])
-    assert any([isinstance(node.op,
+    assert any( isinstance(node.op, T.nnet.CrossentropySoftmax1HotWithBiasDx)
+                for node in cpu_f.maker.fgraph.toposort())
+    assert any( isinstance(node.op,
                            GpuCrossentropySoftmax1HotWithBiasDx)
-                for node in gpu_f.maker.fgraph.toposort()])
+                for node in gpu_f.maker.fgraph.toposort())
 
     cpu_out = cpu_f(softmax_output_value)
     gpu_out = gpu_f(softmax_output_value)

@@ -4149,8 +4149,8 @@ ftensor4 = CudaNdarrayType(dtype='float32', broadcastable=(False,) * 4)
 def profile_printer(fct_name, compile_time, fct_call_time, fct_call,
                     apply_time, apply_cimpl, message, outputs_size,
                     other_time):
-    if any([x[1].op.__class__.__name__.lower().startswith("gpu")
-            for x in apply_time.keys()]):
+    if any( x[1].op.__class__.__name__.lower().startswith("gpu")
+            for x in apply_time.keys()):
         local_time = sum(apply_time.values())
         print()
         print('Some info useful for gpu:')

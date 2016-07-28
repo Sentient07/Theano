@@ -641,7 +641,7 @@ Test them first, as they are not guaranteed to always provide a speedup.""")
                 return False
             else:
                 l = list_scalar_op(op)
-                return any([s_op.__class__ in [scal.Exp] for s_op in l])
+                return any( s_op.__class__ in [scal.Exp] for s_op in l)
 
         printed_tip = False
         # tip 1
@@ -650,17 +650,17 @@ Test them first, as they are not guaranteed to always provide a speedup.""")
             printed_tip = True
 
         # tip 2
-        if not config.lib.amdlibm and any([amdlibm_speed_up(a.op) for i, a
-                                           in apply_time]):
+        if not config.lib.amdlibm and any( amdlibm_speed_up(a.op) for i, a
+                                           in apply_time):
             print("  - Try installing amdlibm and set the Theano flag "
                   "lib.amdlibm=True. This speeds up only some Elemwise "
                   "operation.")
             printed_tip = True
 
         # tip 3
-        if not config.lib.amdlibm and any([exp_float32_op(a.op) and
+        if not config.lib.amdlibm and any( exp_float32_op(a.op) and
                                            a.inputs[0].dtype == 'float32'
-                                           for i, a in apply_time]):
+                                           for i, a in apply_time):
             print("  - With the default gcc libm, exp in float32 is slower "
                   "than in float64! Try Theano flag floatX=float64, or "
                   "install amdlibm and set the theano flags lib.amdlibm=True")
@@ -670,8 +670,9 @@ Test them first, as they are not guaranteed to always provide a speedup.""")
         for a, t in iteritems(apply_time):
             node = a[1]
             if (isinstance(node.op, T.Dot) and
-                    all([len(i.type.broadcastable) == 2
-                         for i in node.inputs])):
+                    all(
+                    len(i.type.broadcastable) == 2
+                         for i in node.inputs)):
                 print("  - You have a dot operation that was not optimized to"
                       " dot22 (which is faster). Make sure the inputs are "
                       "float32 or float64, and are the same for both inputs. "

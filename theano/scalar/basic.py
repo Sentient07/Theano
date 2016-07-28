@@ -714,7 +714,7 @@ class same_out(object):
 
 
 def upcast_out_no_complex(*types):
-    if any([type in complex_types for type in types]):
+    if any( type in complex_types for type in types):
         raise TypeError('complex type are not supported')
     return get_scalar_type(dtype=Scalar.upcast(*types)),
 
@@ -1388,7 +1388,7 @@ class Maximum(BinaryScalarOp):
     def c_code(self, node, name, inputs, outputs, sub):
         (x, y) = inputs
         (z,) = outputs
-        if any([i.type in complex_types for i in node.inputs]):
+        if any( i.type in complex_types for i in node.inputs):
             raise NotImplementedError()
         # Test for both y>x and x>=y to detect NaN
         return ('%(z)s = ((%(y)s)>(%(x)s)? (%(y)s): '
@@ -1427,7 +1427,7 @@ class Minimum(BinaryScalarOp):
     def c_code(self, node, name, inputs, outputs, sub):
         (x, y) = inputs
         (z,) = outputs
-        if any([i.type in complex_types for i in node.inputs]):
+        if any( i.type in complex_types for i in node.inputs):
             raise NotImplementedError()
         return ('%(z)s = ((%(y)s)<(%(x)s)? (%(y)s): '
                 '((%(x)s)<=(%(y)s)? (%(x)s): nan("")));' % locals())
@@ -3605,8 +3605,8 @@ class Composite(ScalarOp):
         # only 1 new Composite each time at the output.
         for i in inputs:
             assert i not in outputs  # This isn't supported, use identity
-        if len(outputs) > 1 or not any([isinstance(var.owner.op, Composite)
-                                        for var in outputs]):
+        if len(outputs) > 1 or not any( isinstance(var.owner.op, Composite)
+                                        for var in outputs):
             # No inner Composite
             inputs, outputs = gof.graph.clone(inputs, outputs)
         else:

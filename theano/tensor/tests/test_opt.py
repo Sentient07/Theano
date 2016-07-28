@@ -1757,7 +1757,7 @@ def test_local_useless_subtensor():
             assert prog[1].op == tensor.exp, dims
             assert len(prog) == 2, dims
         else:
-            assert any([isinstance(node.op, Subtensor) for node in prog])
+            assert any( isinstance(node.op, Subtensor) for node in prog)
         f([[0, 1, 2], [3, 4, 5]])  # let debugmode test something
 
     # Test Variable
@@ -1780,7 +1780,7 @@ def test_local_useless_subtensor():
             assert prog[0].op == tensor.exp, dims
             assert len(prog) == 1, dims
         else:
-            assert any([isinstance(node.op, Subtensor) for node in prog])
+            assert any( isinstance(node.op, Subtensor) for node in prog)
         f([[0, 1, 2], [3, 4, 5]])  # let debugmode test something
     # Test mix Variable and Constant
     # Currently not supported
@@ -1795,7 +1795,7 @@ def test_local_useless_subtensor():
             assert prog[0].op == tensor.exp, dims
             assert len(prog) == 1, dims
         else:
-            assert any([isinstance(node.op, Subtensor) for node in prog])
+            assert any( isinstance(node.op, Subtensor) for node in prog)
         f([[0, 1, 2], [3, 4, 5]])  # let debugmode test something
 
     # Test scalar variable
@@ -1810,7 +1810,7 @@ def test_local_useless_subtensor():
             assert prog[0].op == tensor.exp, dims
             assert len(prog) == 1, dims
         else:
-            assert any([isinstance(node.op, Subtensor) for node in prog])
+            assert any( isinstance(node.op, Subtensor) for node in prog)
         f([[1, 2, 3], [4, 5, 6]], 1)
         f([[1, 2, 3], [4, 5, 6]], 3)
 
@@ -1833,8 +1833,8 @@ def test_local_useless_subtensor():
             assert prog[1].op == tensor.exp, dims
             assert len(prog) == 2, dims
         else:
-            assert any([isinstance(node.op, AdvancedSubtensor1)
-                        for node in prog])
+            assert any( isinstance(node.op, AdvancedSubtensor1)
+                        for node in prog)
         f([[0, 1, 2], [3, 4, 5]])  # let debugmode test something
 
 
@@ -2995,12 +2995,12 @@ def test_local_IncSubtensor_serialize():
     adds = [n for n in topo if isinstance(n.op, T.Elemwise) and
             isinstance(n.op.scalar_op, theano.scalar.Add)]
     for a in adds:
-        assert not any([inp.owner and
+        assert not any( inp.owner and
                         isinstance(inp.owner.op,
                                    (tensor.IncSubtensor,
                                     tensor.AdvancedIncSubtensor,
                                     tensor.AdvancedIncSubtensor1))
-                        for inp in a.inputs])
+                        for inp in a.inputs)
 
     # Now test that the stack trace is copied over properly,
     # if we return the gradients. We need to use same mode as before.
@@ -4499,7 +4499,7 @@ def test_constant_folding():
     f = theano.function([], [x * 2, x + x], mode=mode)
     topo = f.maker.fgraph.toposort()
     assert len(topo) == 2
-    assert all([isinstance(n.op, DeepCopyOp) for n in topo])
+    assert all( isinstance(n.op, DeepCopyOp) for n in topo)
 
 
 def test_constant_get_stabilized():
@@ -5315,14 +5315,14 @@ class T_local_sum_prod(unittest.TestCase):
                 assert len(f.maker.fgraph.apply_nodes) == nb_nodes[1]
                 topo = f.maker.fgraph.toposort()
                 assert topo[-1].op == T.alloc
-                assert not any([isinstance(node.op, T.Sum) for node in topo])
+                assert not any( isinstance(node.op, T.Sum) for node in topo)
             for i in xrange(3):
                 f = theano.function([a], t_like(a).sum(i), mode=mode)
                 utt.assert_allclose(f(input), n_like(input).sum(i))
                 assert len(f.maker.fgraph.apply_nodes) == nb_nodes[2]
                 topo = f.maker.fgraph.toposort()
                 assert topo[-1].op == T.alloc
-                assert not any([isinstance(node.op, T.Sum) for node in topo])
+                assert not any( isinstance(node.op, T.Sum) for node in topo)
 
             # test prod
             f = theano.function([a], t_like(a).prod(None), mode=mode)
@@ -5339,14 +5339,14 @@ class T_local_sum_prod(unittest.TestCase):
                 #assert len(f.maker.fgraph.apply_nodes) == nb_nodes[1]
                 topo = f.maker.fgraph.toposort()
                 assert topo[-1].op == T.alloc
-                assert not any([isinstance(node.op, T.elemwise.Prod) for node in topo])
+                assert not any( isinstance(node.op, T.elemwise.Prod) for node in topo)
             for i in range(3):
                 f = theano.function([a], t_like(a).prod(i), mode=mode)
                 utt.assert_allclose(f(input), n_like(input).prod(i))
                 #assert len(f.maker.fgraph.apply_nodes) == nb_nodes[2]
                 topo = f.maker.fgraph.toposort()
                 assert topo[-1].op == T.alloc
-                assert not any([isinstance(node.op, T.elemwise.Prod) for node in topo])
+                assert not any( isinstance(node.op, T.elemwise.Prod) for node in topo)
 
             backup = config.warn.sum_sum_bug
             config.warn.sum_sum_bug = False
@@ -5359,8 +5359,8 @@ class T_local_sum_prod(unittest.TestCase):
                     assert len(f.maker.fgraph.apply_nodes) == nb_nodes[3]
                     topo = f.maker.fgraph.toposort()
                     assert topo[-1].op == T.alloc
-                    assert not any([isinstance(node.op,
-                                               T.Sum) for node in topo])
+                    assert not any( isinstance(node.op,
+                                               T.Sum) for node in topo)
             finally:
                 config.warn.sum_sum_bug = backup
 
@@ -5431,18 +5431,16 @@ class T_local_reduce(unittest.TestCase):
                     tensor.max, tensor.min]:
             x = T.TensorType('int64', (True, True, True))()
             f = theano.function([x], [fct(x)], mode=self.mode)
-            assert not any([
-                isinstance(node.op, T.CAReduce)
-                for node in f.maker.fgraph.toposort()])
+            assert not any( isinstance(node.op, T.CAReduce)
+                for node in f.maker.fgraph.toposort())
 
     def test_local_reduce_broadcast_all_1(self):
         for fct in [tensor.sum, tensor.all, tensor.any, tensor.prod,
                     tensor.max, tensor.min]:
             x = T.TensorType('int64', (True, True))()
             f = theano.function([x], [fct(x, axis=[0, 1])], mode=self.mode)
-            assert not any([
-                isinstance(node.op, T.CAReduce)
-                for node in f.maker.fgraph.toposort()])
+            assert not any( isinstance(node.op, T.CAReduce)
+                for node in f.maker.fgraph.toposort())
 
     def test_local_reduce_broadcast_some_0(self):
         for fct in [tensor.sum, tensor.all, tensor.any, tensor.prod,
@@ -5470,9 +5468,8 @@ class T_local_reduce(unittest.TestCase):
                     tensor.max, tensor.min]:
             x = T.TensorType('int64', (True, True, True))()
             f = theano.function([x], [fct(x, axis=[0, 2])], mode=self.mode)
-            assert not any([
-                isinstance(node.op, T.CAReduce)
-                for node in f.maker.fgraph.toposort()])
+            assert not any( isinstance(node.op, T.CAReduce)
+                for node in f.maker.fgraph.toposort())
 
     def test_local_reduce_join(self):
         vx = matrix()
@@ -5884,8 +5881,8 @@ def test_local_join_empty():
     assert numpy.all(val == [1])
     e = f.maker.fgraph.toposort()
     assert len([n for n in e if isinstance(n.op, Join)]) == 1
-    assert all([not isinstance(n.op, Join) or len(n.inputs) == 3
-                for n in e if isinstance(n.op, Join)])
+    assert all( not isinstance(n.op, Join) or len(n.inputs) == 3
+                for n in e if isinstance(n.op, Join))
     assert f.maker.fgraph.outputs[0].dtype == config.floatX
 
 
@@ -5898,8 +5895,8 @@ def test_local_join_empty():
     assert numpy.all(val == [[1]])
     e = f.maker.fgraph.toposort()
     assert len([n for n in e if isinstance(n.op, Join)]) == 1
-    assert all([not isinstance(n.op, Join) or len(n.inputs) == 4
-                for n in e if isinstance(n.op, Join)])
+    assert all( not isinstance(n.op, Join) or len(n.inputs) == 4
+                for n in e if isinstance(n.op, Join))
     assert f.maker.fgraph.outputs[0].dtype == config.floatX
     # test for vector, vector, empty to matrix
     # We can't optimize this case.
@@ -5909,8 +5906,8 @@ def test_local_join_empty():
     assert numpy.all(val == [1])
     e = f.maker.fgraph.toposort()
     assert len([n for n in e if isinstance(n.op, Join)]) == 1
-    assert all([not isinstance(n.op, Join) or len(n.inputs) == 4
-                for n in e if isinstance(n.op, Join)])
+    assert all( not isinstance(n.op, Join) or len(n.inputs) == 4
+                for n in e if isinstance(n.op, Join))
     assert f.maker.fgraph.outputs[0].dtype == config.floatX
     # test for matrix join(0,a)
     # We can't optimize this case.
@@ -5920,8 +5917,8 @@ def test_local_join_empty():
     assert numpy.all(val == [[1], [2], [1]])
     e = f.maker.fgraph.toposort()
     assert len([n for n in e if isinstance(n.op, Join)]) == 1
-    assert all([not isinstance(n.op, Join) or len(n.inputs) == 4
-                for n in e if isinstance(n.op, Join)])
+    assert all( not isinstance(n.op, Join) or len(n.inputs) == 4
+                for n in e if isinstance(n.op, Join))
     assert f.maker.fgraph.outputs[0].dtype == config.floatX
 
 
@@ -5936,8 +5933,8 @@ def test_local_join_make_vector():
     assert numpy.all(val == [1, 7, 8, 2, 3, 4, 6])
     e = f.maker.fgraph.toposort()
     assert len([n for n in e if isinstance(n.op, Join)]) == 1
-    assert all([not isinstance(n.op, Join) or len(n.inputs) == 4
-                for n in e if isinstance(n.op, Join)])
+    assert all( not isinstance(n.op, Join) or len(n.inputs) == 4
+                for n in e if isinstance(n.op, Join))
     assert f.maker.fgraph.outputs[0].dtype == config.floatX
 
     assert check_stack_trace(f, ops_to_check='all')

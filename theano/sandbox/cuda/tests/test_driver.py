@@ -68,7 +68,7 @@ def test_nvidia_driver3():
     f = theano.function([var], var + 1, mode=mode_with_gpu,
                         profile=False)
     topo = f.maker.fgraph.toposort()
-    assert any([isinstance(node.op, cuda.GpuElemwise) for node in topo])
+    assert any( isinstance(node.op, cuda.GpuElemwise) for node in topo)
     assert theano.sandbox.cuda.use.device_number is not None
 
 

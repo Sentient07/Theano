@@ -224,8 +224,8 @@ class RecordMode(Mode):
                                  "running during the playback.")
 
             if fgraph not in self.known_fgraphs:
-                assert not any([elem.name == fgraph.name
-                                for elem in self.known_fgraphs])
+                assert not any( elem.name == fgraph.name
+                                for elem in self.known_fgraphs)
                 self.known_fgraphs.add(fgraph)
                 num_app = len(fgraph.apply_nodes)
                 line = 'Function ' + fgraph.name + ' has ' + str(num_app) \
@@ -236,7 +236,7 @@ class RecordMode(Mode):
             handle_line(line, i, node, fn)
             line = 'Node ' + str(i) + ':' + str(node) + '\n'
             handle_line(line, i, node, fn)
-            assert all([isinstance(x, list) and len(x) == 1 for x in fn.inputs])
+            assert all( isinstance(x, list) and len(x) == 1 for x in fn.inputs)
 
             def digest(x):
                 x = x[0]

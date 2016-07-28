@@ -774,8 +774,8 @@ def test_grad_clip():
 
     if theano.config.mode != "FAST_COMPILE":
         topo = f.maker.fgraph.toposort()
-        assert not any([isinstance(node.op, gradient.GradClip)
-                        for node in topo])
+        assert not any( isinstance(node.op, gradient.GradClip)
+                        for node in topo)
     out = f(2.)
     assert np.allclose(out, (1, 4))
     assert not np.allclose(out[0], out[1])

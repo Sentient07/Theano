@@ -467,7 +467,8 @@ class _tensor_py_operators(object):
     # SLICING/INDEXING
     def __getitem__(self, args):
         if (isinstance(args, list) and
-                any([isinstance(a, slice) for a in args])):
+                any(
+                isinstance(a, slice) for a in args)):
             pass
         elif not isinstance(args, tuple):
             args = args,

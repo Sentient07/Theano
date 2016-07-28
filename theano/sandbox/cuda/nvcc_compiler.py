@@ -114,7 +114,7 @@ class NVCC_compiler(Compiler):
             flags.append("-DNPY_ARRAY_F_CONTIGUOUS=NPY_F_CONTIGUOUS")
 
         # If the user didn't specify architecture flags add them
-        if not any(['-arch=sm_' in f for f in flags]):
+        if not any( '-arch=sm_' in f for f in flags):
             # We compile cuda_ndarray.cu during import.
             # We should not add device properties at that time.
             # As the device is not selected yet!

@@ -308,8 +308,8 @@ def test_careduce():
 def test_flatten():
     x = cuda.fmatrix('x')
     f = theano.function([x], x.flatten(), mode=mode_with_gpu)
-    assert any([node for node in f.maker.fgraph.toposort()
-                if isinstance(node.op, B.GpuReshape)])
+    assert any( node for node in f.maker.fgraph.toposort()
+                if isinstance(node.op, B.GpuReshape))
     assert theano.tensor.is_flat(x.flatten())
     assert len(f([[0., 0.], [0., 0.]]).shape) == 1
 
@@ -325,7 +325,7 @@ def test_reshape():
     fv = f(cuda_ndarray.CudaNdarray(theano._asarray([0, 1, 2, 3, 4, 5],
                                                     dtype='float32')))
     topo = f.maker.fgraph.toposort()
-    assert any([isinstance(node.op, B.GpuReshape) for node in topo])
+    assert any( isinstance(node.op, B.GpuReshape) for node in topo)
     assert numpy.all(fv == numpy.asarray([[0, 1, 2], [3, 4, 5]]))
 
     # test that it works without inplace operations
@@ -338,7 +338,7 @@ def test_reshape():
 
     f_sub = theano.function([a, b], c - b, mode=mode_with_gpu)
     topo = f_sub.maker.fgraph.toposort()
-    assert any([isinstance(node.op, B.GpuReshape) for node in topo])
+    assert any( isinstance(node.op, B.GpuReshape) for node in topo)
     assert numpy.all(f_sub(a_val, b_val) == 0.0)
     assert numpy.all(numpy.asarray(a_val) == numpy.asarray(a_val_copy))
 
@@ -349,7 +349,7 @@ def test_reshape():
 
     f_sub = theano.function([a, b], c - b, mode=mode_with_gpu)
     topo = f_sub.maker.fgraph.toposort()
-    assert any([isinstance(node.op, B.GpuReshape) for node in topo])
+    assert any( isinstance(node.op, B.GpuReshape) for node in topo)
     assert numpy.all(f_sub(a_val, b_val) == 0.0)
     assert numpy.all(numpy.asarray(a_val) == numpy.asarray(a_val_copy))
 
@@ -571,8 +571,8 @@ def test_elemwise_comparaison_cast():
 
         out = f(av, bv)
         assert numpy.all(out == ans)
-        assert any([isinstance(node.op, cuda.GpuElemwise)
-                    for node in f.maker.fgraph.toposort()])
+        assert any( isinstance(node.op, cuda.GpuElemwise)
+                    for node in f.maker.fgraph.toposort())
 
 
 def test_elemwise_composite_float64():
@@ -607,8 +607,8 @@ def test_elemwise_composite_float64():
                 if isinstance(node.op.scalar_op, theano.scalar.Composite):
                     scals = get_all_basic_scalar(node.op.scalar_op)
                     for s in scals:
-                        assert not any([i.type.dtype == 'float64'
-                                        for i in s.inputs + s.outputs])
+                        assert not any( i.type.dtype == 'float64'
+                                        for i in s.inputs + s.outputs)
 
 
 def test_elemwise_composite_support_code():
@@ -905,7 +905,7 @@ def test_gpujoin_no_rebroadcast():
     a = tcn.shared_constructor(_a)
     f = theano.function([], T.join(1, a))
     l = f.maker.fgraph.toposort()
-    assert not any([isinstance(x.op, T.Rebroadcast) for x in l])
+    assert not any( isinstance(x.op, T.Rebroadcast) for x in l)
 
 
 def test_gpualloc_input_on_gpu():
@@ -1216,8 +1216,8 @@ def test_many_arg_elemwise():
                     outputs.append(f(*args))
                     # assert that the test was done on the gpu.
                     if mode is mode_with_gpu:
-                        assert any([isinstance(node.op, cuda.GpuElemwise)
-                                    for node in f.maker.fgraph.apply_nodes])
+                        assert any( isinstance(node.op, cuda.GpuElemwise)
+                                    for node in f.maker.fgraph.apply_nodes)
 
                     # test the optijmization local_gpu_elemwise_1
                     f = theano.function(
@@ -1227,8 +1227,8 @@ def test_many_arg_elemwise():
                     out = f(*args)
                     # assert that the test was done on the gpu.
                     if mode is mode_with_gpu:
-                        assert any([isinstance(node.op, cuda.GpuElemwise)
-                                    for node in f.maker.fgraph.apply_nodes])
+                        assert any( isinstance(node.op, cuda.GpuElemwise)
+                                    for node in f.maker.fgraph.apply_nodes)
                     utt.assert_allclose(out, outputs[-1])
 
                 results_gpu, results_cpu = outputs
@@ -1287,8 +1287,8 @@ def test_gpueye():
         utt.assert_allclose(result, numpy.eye(N, M_, K, dtype=dtype))
         assert result.dtype == numpy.dtype(dtype)
         if K == 0:
-            assert any([isinstance(node.op, B.GpuEye)
-                        for node in f.maker.fgraph.toposort()])
+            assert any( isinstance(node.op, B.GpuEye)
+                        for node in f.maker.fgraph.toposort())
 
     for dtype in ['float32']:
         yield check, dtype, 3

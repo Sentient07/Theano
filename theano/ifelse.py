@@ -407,8 +407,8 @@ def cond_make_inplace(node):
         # For big graph, do not make inplace scalar to speed up
         # optimization.
         (len(node.fgraph.apply_nodes) < 500 or
-         not all([getattr(o.type, 'ndim', -1) == 0
-                  for o in node.outputs]))):
+         not all( getattr(o.type, 'ndim', -1) == 0
+                  for o in node.outputs))):
         return IfElse(n_outs=op.n_outs,
                       as_view=True,
                       gpu=op.gpu,

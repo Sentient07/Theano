@@ -168,7 +168,7 @@ def debugprint(obj, depth=-1, print_type=False,
                             obj)
 
     scan_ops = []
-    if any([p for p in profile_list if p is not None and p.fct_callcount > 0]):
+    if any( p for p in profile_list if p is not None and p.fct_callcount > 0):
         print("""
 Timing Info
 -----------
