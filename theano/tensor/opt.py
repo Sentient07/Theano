@@ -1758,10 +1758,15 @@ def local_useless_alloc(node):
 @register_canonicalize
 @gof.local_optimizer([T.alloc])
 def local_canonicalize_alloc(node):
-    """
-    If the input type is the same as the output type (dtype and broadcast)
+    """If the input type is the same as the output type (dtype and broadcast)
     there is no change in the shape of the input. So this is just a simple copy
-    of the input. This is not needed.
+    of the input. This is not needed. (as local_useless_alloc)
+
+    Also, it will canonicalize alloc by creating Dimshuffle after the
+    alloc to introduce the dimensions of constant size 1.
+
+    See https://github.com/Theano/Theano/issues/4072 to know why this
+    is needed.
 
     """
     op = node.op
@@ -1776,7 +1781,6 @@ def local_canonicalize_alloc(node):
         # We don't need to copy over any stack traces here
         return [input]
 
-    # TODO: Find/Explain why this is a good idea.
     # Check if alloc adds a broadcastable dimension with shape 1.
     output_shape = node.inputs[1:]
     num_dims_with_size_1_added_to_left = 0
@@ -2978,6 +2982,7 @@ def local_subtensor_merge(node):
             return [out]
 
 
+@register_useless
 @register_canonicalize
 @register_specialize
 @gof.local_optimizer([Subtensor])
@@ -3621,6 +3626,7 @@ def local_join_1(node):
 
 
 # TODO: merge in local_useless_join
+@register_useless
 @register_specialize
 @register_canonicalize
 @gof.local_optimizer([T.Join])
