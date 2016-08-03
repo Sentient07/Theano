@@ -7223,6 +7223,7 @@ def local_grad_clip(node):
         return node.inputs
 
 
+@register_useless
 @register_canonicalize
 @register_stabilize
 @register_specialize
