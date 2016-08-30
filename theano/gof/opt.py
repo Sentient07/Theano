@@ -200,7 +200,7 @@ class SeqOptimizer(Optimizer, list):
         opts : List
         The List of optimizers to be applied to a node
         kw : Dict
-        Dictonary containing failure callback. The only supported keyword is `failure_callback`.
+        Dictonary containing failure call back message
 
         """
         if len(opts) == 1 and isinstance(opts[0], (list, tuple)):
@@ -1238,8 +1238,8 @@ def local_optimizer(tracks, inplace=False, requirements=()):
 class LocalOptGroup(LocalOptimizer):
     """
     Takes a list of LocalOptimizer and applies them to the nodes.
-    If apply_all_opts is False, it will return after the first optimizer applied.
-    Otherwise, it will start again with the node returned by the previous optimizer.
+    When apply_all_opts is set to True, it tries multiple optimization to a node.
+    A node is first optimized and the list of optimizers for the optimized node is applied
 
     Parameters
     ----------
@@ -1291,30 +1291,35 @@ class LocalOptGroup(LocalOptimizer):
         if len(self.opts) == 0:
             return
 
-        def apply_mult_opts(node, multiple_opts=False):
-            repl = False
-            opts = []
-            opts.append(self.track_map.get(type(node.op), []) + self.track_map.get(node.op, []) + self.track_map.get(None, []))
+        def compute_opts(node):
+            opts = self.track_map.get(type(node.op), [])
+            opts += self.track_map.get(node.op, [])
+            opts += self.track_map.get(None, [])
+            return opts
 
-            for opt in opts:
+        def apply_mult_opts(opt_list, node, multiple_opts=False):
+            repl = False
+
+            for opt in opt_list:
                 opt_start = time.time()
                 repl = opt.transform(node)
                 opt_finish = time.time()
-                self.time_opts[opt] = opt_start - opt_finish
-                self.process_count[opt] += 1
                 if not repl:
                     continue
                 else:
+                    self.time_opts[opt] = opt_start - opt_finish
+                    self.process_count[opt] += 1
                     if not multiple_opts or not repl[0].owner:
                         return repl
                     assert len(repl) == 1
                     # Ensuring not the input of graph
                     assert repl[0].owner
                     new_node = repl[0].owner
-                    apply_mult_opts(new_node, True)
+                    new_opts = compute_opts(new_node)
+                    apply_mult_opts(new_opts, new_node, True)
             return repl
         node_start = time.time()
-        new_var = apply_mult_opts(node, self.apply_all_opts)
+        new_var = apply_mult_opts(compute_opts(node), node, self.apply_all_opts)
         node_finish = time.time()
         self.time_nodes[node] = node_finish - node_start
         return new_var
@@ -1339,7 +1344,7 @@ class LocalOptGroup(LocalOptimizer):
                   file=stream)
             count_opt.sort()
             for (t, count, o) in count_opt[::-1]:
-                print(blanc, '  %.3fs - %d - %s' % (
+                print(blanc, '  %.3fs - %d - %d - %s' % (
                     t, count, o), file=stream)
             print(blanc, '  %.3fs - in %d optimization that were not used (display those with runtime greater than 0)' % (
                 not_used_time, len(not_used)), file=stream)
@@ -1351,6 +1356,7 @@ class LocalOptGroup(LocalOptimizer):
             print(file=stream)
 
     def print_summary(self, stream=sys.stdout, level=0, depth=-1):
+        blanc = ('    ' * level)
         print("%s%s id=%i" % (
             (' ' * level), self.__class__.__name__, id(self)), file=stream)
         if depth != 0:
@@ -1868,6 +1874,12 @@ class NavigatorOptimizer(Optimizer):
         if u is not None:
             fgraph.remove_feature(u)
 
+    @staticmethod
+    def print_profile(stream, prof, level=0):
+        import pdb
+        pdb.set_trace()
+
+
     def process_node(self, fgraph, node, lopt=None):
         """
         This function will use `lopt` to `transform` the `node`. The
@@ -2042,7 +2054,7 @@ class TopoOptimizer(NavigatorOptimizer):
 
 
 def out2in(*local_opts, **kwargs):
-    """
+    """ 
     Uses the TopoOptimizer from the output nodes to input nodes of the graph.
     """
     name = (kwargs and kwargs.pop('name', None))

@@ -322,7 +322,7 @@ class SequenceDB(DB):
     def register(self, name, obj, position, *tags):
         super(SequenceDB, self).register(name, obj, *tags)
         if position == 'last':
-            self.position[name] = max(self.position.values())
+            self.__position__[name] = len(self.__position__)
         else:
             assert isinstance(position, (integer_types, float))
             self.__position__[name] = position
@@ -417,7 +417,7 @@ class LocalGroupDB(DB):
 class TopoDB(DB):
     """
 
-    Generate a Global Optimizer of type TopoOptimizer.
+    Generate a local optimizer of type TopoOptimizer.
 
     """
 

@@ -1712,6 +1712,7 @@ compile.optdb.register('local_elemwise_alloc',
                        1.52, 'fast_run')
 
 
+@register_canonicalize("fast_compile")
 @register_useless
 @gof.local_optimizer([T.fill])
 def local_useless_fill(node):
@@ -2537,6 +2538,7 @@ def local_useless_slice(node):
             return [out]
 
 
+@register_useless
 @register_canonicalize
 @register_specialize
 @gof.local_optimizer([Subtensor, AdvancedSubtensor1])
@@ -2988,13 +2990,7 @@ def local_subtensor_merge(node):
 @register_specialize
 @gof.local_optimizer([Subtensor])
 def local_subtensor_of_alloc(node):
-    """
-
-    alloc(val)[x:y] -> alloc(val[...])
-    alloc(val)[x:y] -> alloc(val)
-    This can be seen as a lift, but it also reduce the number of computation/memory.
-
-    """
+    """alloc[x:y] -> alloc"""
     if not isinstance(node.op, Subtensor):
         return False
     u = node.inputs[0]
