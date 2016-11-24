@@ -15,6 +15,7 @@ from theano.gradient import DisconnectedType, grad_not_implemented
 from theano.gof import Optimizer, local_optimizer, COp
 from theano.gof.cmodule import GCC_compiler
 from theano.gof.type import CDataType, Generic
+from theano.gradient import grad_undefined
 from theano.compile import optdb
 from theano.compile.ops import shape_i, shape_i_op
 from theano.tensor.nnet import LogSoftmax, SoftmaxGrad
@@ -3240,7 +3241,6 @@ def local_abstract_batch_norm_train_grad_cudnn(op, ctx_name, inputs, outputs):
         g_wrt_bias = theano.tensor.reshape(g_wrt_bias, params_shape)
 
     return [g_wrt_inputs, g_wrt_scale, g_wrt_bias]
-
 
 def local_abstract_batch_norm_inference_cudnn(op, ctx_name, inputs, outputs):
     x, scale, bias, estimated_mean, estimated_variance, epsilon = inputs
