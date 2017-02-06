@@ -2,7 +2,7 @@ from __future__ import absolute_import, print_function, division
 import os.path
 
 import theano
-from theano import Apply, Op, tensor, config
+from theano import Apply, tensor, config
 from theano.tensor.basic import as_tensor_variable
 from theano.tensor.signal.pool import Pool
 from theano.gradient import grad_undefined
@@ -428,15 +428,15 @@ class GpuRoIPoolOp(CGpuKernelBase):
         return [os.path.dirname(__file__), pygpu.get_include()]
 
     def c_headers(self):
-        return ['<gpuarray/types.h>', '<gpuarray/kernel.h>', 'gpuarray_helper.h','math.h', 'stdbool.h', 'float.h', 'gpuarray_api.h', 'numpy_compat.h']
+        return ['<gpuarray/types.h>', '<gpuarray/kernel.h>', 'gpuarray_helper.h', 'math.h', 'stdbool.h', 'float.h', 'gpuarray_api.h', 'numpy_compat.h', 'limits.h']
 
-    def make_node(self, feature_maps, roi):
-        ctx_name = infer_context_name(feature_maps, roi)
-        feature_maps = as_gpuarray_variable(feature_maps, ctx_name)
-        roi_tuples = as_gpuarray_variable(roi, ctx_name)
-        assert feature_maps.ndim == 4
+    def make_node(self, data, roi):
+        ctx_name = infer_context_name(data, roi)
+        data = as_gpuarray_variable(data, ctx_name)
+        roi = as_gpuarray_variable(roi, ctx_name)
+        assert data.ndim == 4
         assert roi.ndim == 2
-        return Apply(self, [feature_maps, roi_tuples], [feature_maps.type(), feature_maps.type()])
+        return Apply(self, [data, roi], [data.type(), data.type()])
 
     def get_op_params(self):
         return [('POOLED_HEIGHT', str(self.pooled_h)),
@@ -449,11 +449,12 @@ class GpuRoIPoolOp(CGpuKernelBase):
     def infer_shape(self, node, in_shapes):
         data_shape = tensor.shape(node.inputs[0])
         rois_shape = tensor.shape(node.inputs[1])
-        batch_size = rois_shape[0]
-        num_maps = data_shape[1]
+        batch_size = data_shape[0]
+        num_rois = rois_shape[0]
         h = self.pooled_h
         w = self.pooled_w
-        out_shape = [batch_size, num_maps, h, w]
+        channels = data_shape[1]
+        out_shape = [batch_size, num_rois, channels, h * w]
         return [out_shape, out_shape]
 
     def c_code_cache_version(self):
