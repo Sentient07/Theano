@@ -105,6 +105,8 @@ int APPLY_SPECIFIC(ROIPoolGPUFwd)(PyGpuArrayObject *data,
     }
   }
 
+  printf("spatial_scale is %lf\n", spatial_scale);
+
   err = ROIPoolGPUFwd_kernel_scall(1, &address, 0,
           num_rois, data->ga.data, spatial_scale, channels, height, width,
           POOLED_HEIGHT, POOLED_WIDTH, rois->ga.data, (*out)->ga.data,
